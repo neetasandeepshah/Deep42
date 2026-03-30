@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="space">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep42 — Chart Your Universe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Fira+Mono:wght@400;500&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root { --transition: all 0.35s cubic-bezier(0.4,0,0.2,1); }
+
+[data-theme="dark"] {
+  --bg-deep:#080d14; --bg-chart:#0c1520; --bg-pane:#101c2a; --bg-card:#0f1e2e; --bg-input:#091422;
+  --border:rgba(161,124,60,0.22); --border-hi:rgba(201,160,76,0.55);
+  --ink:#e8dfc8; --ink-muted:#8a7d65; --ink-faint:rgba(232,223,200,0.25);
+  --gold:#c9a84c; --gold-glow:rgba(201,160,76,0.18); --gold-dim:#8b6914;
+  --compass:#b5372a; --compass-lo:rgba(181,55,42,0.18);
+  --sea:#1a4060; --sea-bright:#2e7faa; --green-nav:#4a9e6b; --red-nav:#c0402e;
+  --parchment:rgba(201,168,76,0.06); --shadow:rgba(0,0,0,0.6); --grid-line:rgba(161,124,60,0.08);
+}
+[data-theme="light"] {
+  --bg-deep:#e8dfc8; --bg-chart:#f0e6cc; --bg-pane:#f5edda; --bg-card:#fdf6e3; --bg-input:#ede0c4;
+  --border:rgba(101,74,20,0.25); --border-hi:rgba(139,105,20,0.6);
+  --ink:#2a1f0e; --ink-muted:#7a6840; --ink-faint:rgba(42,31,14,0.3);
+  --gold:#8b6914; --gold-glow:rgba(139,105,20,0.12); --gold-dim:#a07c1a;
+  --compass:#8b2218; --compass-lo:rgba(139,34,24,0.1);
+  --sea:#2a5f80; --sea-bright:#1a5878; --green-nav:#2d7048; --red-nav:#8b2c1c;
+  --parchment:rgba(200,165,80,0.08); --shadow:rgba(60,40,10,0.25); --grid-line:rgba(101,74,20,0.1);
+}
+
+[data-theme="space"] {
+  --bg-deep:#000508; --bg-chart:#020a10; --bg-pane:#030d16; --bg-card:#04111c; --bg-input:#020a10;
+  --border:rgba(0,220,140,0.18); --border-hi:rgba(57,255,20,0.5);
+  --ink:#b8ffd0; --ink-muted:#3d8a60; --ink-faint:rgba(184,255,208,0.2);
+  --gold:#39ff14; --gold-glow:rgba(57,255,20,0.15); --gold-dim:#1a9900;
+  --compass:#00cfff; --compass-lo:rgba(0,207,255,0.12);
+  --sea:#003850; --sea-bright:#00cfff; --green-nav:#39ff14; --red-nav:#ff3060;
+  --parchment:rgba(0,255,140,0.04); --shadow:rgba(0,0,0,0.85); --grid-line:rgba(0,207,255,0.06);
+}
+
+/* Space mode overrides */
+[data-theme="space"] body { font-family: 'Lora', serif; }
+[data-theme="space"] .logo-mark { font-family: 'VT323', monospace; font-size:30px; letter-spacing:5px; color:var(--gold); text-shadow:0 0 20px var(--gold),0 0 40px rgba(57,255,20,0.3); }
+[data-theme="space"] .nav-section { font-family:'VT323',monospace; font-size:12px; letter-spacing:3px; }
+[data-theme="space"] .nav-item { font-family:'VT323',monospace; font-size:15px; letter-spacing:1px; }
+[data-theme="space"] .card-title { font-family:'VT323',monospace; font-size:14px; letter-spacing:3px; color:var(--gold); }
+[data-theme="space"] .page-title { font-family:'VT323',monospace; font-size:16px; letter-spacing:4px; }
+[data-theme="space"] .stat-tile-val { font-family:'VT323',monospace; font-size:34px; }
+[data-theme="space"] .stat-tile-lbl { font-family:'VT323',monospace; letter-spacing:2.5px; }
+[data-theme="space"] .source-name { font-family:'VT323',monospace; font-size:15px; letter-spacing:1.5px; }
+[data-theme="space"] .btn { font-family:'VT323',monospace; font-size:14px; letter-spacing:2px; }
+[data-theme="space"] .badge { font-family:'VT323',monospace; font-size:11px; letter-spacing:1.5px; }
+[data-theme="space"] .result-name { font-family:'VT323',monospace; font-size:15px; }
+[data-theme="space"] .job-title { font-family:'VT323',monospace; font-size:13px; letter-spacing:1px; }
+[data-theme="space"] .policy-include { font-family:'VT323',monospace; font-size:11px; color:var(--green-nav); border-color:rgba(57,255,20,0.35); }
+[data-theme="space"] .policy-exclude { font-family:'VT323',monospace; font-size:11px; color:var(--red-nav); border-color:rgba(255,48,96,0.35); }
+[data-theme="space"] .empty-title { font-family:'VT323',monospace; font-size:18px; letter-spacing:2px; }
+[data-theme="space"] .stat-tile::after { background:linear-gradient(90deg,transparent,var(--green-nav),transparent); }
+[data-theme="space"] .progress-fill { background:linear-gradient(90deg,var(--gold-dim),var(--gold)); box-shadow:0 0 10px var(--gold); }
+[data-theme="space"] .nav-item.active { text-shadow:0 0 8px var(--gold); }
+[data-theme="space"] input::placeholder { font-style:normal; font-family:'VT323',monospace; font-size:14px; }
+[data-theme="space"] .search-input::placeholder { font-size:16px; }
+[data-theme="space"] .search-input { font-family:'VT323',monospace; font-size:17px; letter-spacing:0.5px; }
+[data-theme="space"] .toast { font-family:'VT323',monospace; font-size:15px; font-style:normal; letter-spacing:1px; }
+[data-theme="space"] label { font-family:'VT323',monospace; font-size:11px; letter-spacing:2px; }
+[data-theme="space"] .sidebar-footer { font-family:'VT323',monospace; font-style:normal; font-size:14px; letter-spacing:1px; }
+[data-theme="space"] .beacon-dot.live { background:var(--green-nav); box-shadow:0 0 8px var(--green-nav),0 0 20px rgba(57,255,20,0.4); }
+
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg-deep);color:var(--ink);font-family:'Lora',Georgia,serif;font-size:14px;display:flex;height:100vh;overflow:hidden;position:relative;}
+
+#chart-canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+
+.sidebar{width:230px;min-width:230px;background:var(--bg-pane);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:10;box-shadow:2px 0 20px var(--shadow);}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:10;}
+
+.logo{padding:22px 20px 16px;border-bottom:1px solid var(--border);position:relative;}
+.logo-mark{font-family:'Cinzel',serif;font-size:26px;font-weight:900;color:var(--gold);letter-spacing:3px;text-transform:uppercase;line-height:1;text-shadow:0 0 30px var(--gold-glow);}
+.logo-sub{font-family:'Lora',serif;font-style:italic;font-size:10px;color:var(--ink-muted);margin-top:4px;letter-spacing:1px;}
+.logo-compass{position:absolute;right:14px;top:50%;transform:translateY(-50%);opacity:0.35;}
+
+.nav{flex:1;padding:8px 0;overflow-y:auto;}
+.nav-section{padding:18px 18px 5px;font-family:'Cinzel',serif;font-size:9px;font-weight:700;color:var(--ink-muted);letter-spacing:2.5px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 18px;cursor:pointer;color:var(--ink-muted);font-size:12px;font-family:'Cinzel',serif;letter-spacing:0.5px;transition:var(--transition);user-select:none;border-left:2px solid transparent;margin:1px 0;}
+.nav-item:hover{color:var(--ink);background:var(--parchment);border-left-color:var(--gold-dim);}
+.nav-item.active{color:var(--gold);background:var(--gold-glow);border-left-color:var(--gold);}
+.nav-rune{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+
+.sidebar-footer{padding:14px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--ink-muted);font-family:'Lora',serif;font-style:italic;}
+.status-beacon{display:flex;align-items:center;gap:7px;}
+.beacon-dot{width:8px;height:8px;border-radius:50%;background:var(--ink-muted);transition:all 0.5s;}
+.beacon-dot.live{background:var(--green-nav);box-shadow:0 0 8px var(--green-nav);animation:pulse-beacon 2.5s ease-in-out infinite;}
+.beacon-dot.dead{background:var(--red-nav);}
+@keyframes pulse-beacon{0%,100%{box-shadow:0 0 4px var(--green-nav);}50%{box-shadow:0 0 14px var(--green-nav),0 0 24px rgba(74,158,107,0.3);}}
+
+.theme-toggle{background:var(--bg-input);border:1px solid var(--border);border-radius:20px;padding:5px 12px;cursor:pointer;font-size:14px;transition:var(--transition);display:flex;align-items:center;gap:5px;color:var(--ink-muted);}
+.theme-toggle:hover{border-color:var(--gold);color:var(--gold);}
+
+.topbar{background:var(--bg-pane);border-bottom:1px solid var(--border);padding:0 24px;height:54px;display:flex;align-items:center;gap:14px;flex-shrink:0;box-shadow:0 2px 12px var(--shadow);}
+.page-title{font-family:'Cinzel',serif;font-size:13px;font-weight:700;color:var(--gold);letter-spacing:2.5px;text-transform:uppercase;}
+.page-subtitle{font-style:italic;font-size:11px;color:var(--ink-muted);}
+.topbar-div{width:1px;height:20px;background:var(--border);}
+.spacer{flex:1;}
+
+.content{flex:1;overflow-y:auto;padding:24px;}
+.panel{display:none;}
+.panel.active{display:block;animation:fadeChart 0.4s ease;}
+@keyframes fadeChart{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;margin-bottom:16px;overflow:hidden;position:relative;box-shadow:0 4px 24px rgba(0,0,0,0.15);}
+.card::before,.card::after{content:'✦';position:absolute;font-size:8px;color:var(--gold);opacity:0.4;}
+.card::before{top:5px;left:7px;}
+.card::after{bottom:5px;right:7px;}
+.card-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--parchment);}
+.card-title{font-family:'Cinzel',serif;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;}
+.card-body{padding:18px 20px;}
+
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;}
+.form-group{display:flex;flex-direction:column;gap:7px;}
+label{font-family:'Cinzel',serif;font-size:9px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:1.8px;}
+input,select,textarea{background:var(--bg-input);border:1px solid var(--border);border-radius:2px;color:var(--ink);padding:9px 12px;font-size:13px;font-family:'Lora',serif;outline:none;transition:border-color 0.2s;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold-glow);}
+input::placeholder{color:var(--ink-muted);font-style:italic;}
+select option{background:var(--bg-card);}
+
+.btn{padding:9px 18px;border-radius:2px;border:1px solid var(--border);cursor:pointer;font-size:10px;font-family:'Cinzel',serif;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;transition:var(--transition);display:inline-flex;align-items:center;gap:7px;}
+.btn-primary{background:var(--gold-dim);border-color:var(--gold);color:var(--bg-deep);}
+.btn-primary:hover{background:var(--gold);box-shadow:0 0 16px var(--gold-glow);}
+.btn-ghost{background:transparent;color:var(--ink-muted);}
+.btn-ghost:hover{background:var(--parchment);color:var(--ink);border-color:var(--border-hi);}
+.btn-danger{background:transparent;border-color:var(--red-nav);color:var(--red-nav);}
+.btn-danger:hover{background:var(--compass-lo);}
+.btn-success{background:rgba(74,158,107,0.15);border-color:var(--green-nav);color:var(--green-nav);}
+.btn-success:hover{background:rgba(74,158,107,0.28);}
+.btn:disabled{opacity:0.35;cursor:not-allowed;}
+
+.badge{padding:3px 8px;border-radius:1px;font-size:8px;font-family:'Cinzel',serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.badge-gold{background:var(--gold-glow);color:var(--gold);border:1px solid var(--gold-dim);}
+.badge-green{background:rgba(74,158,107,.15);color:var(--green-nav);border:1px solid rgba(74,158,107,.4);}
+.badge-red{background:var(--compass-lo);color:var(--red-nav);border:1px solid rgba(181,55,42,.3);}
+.badge-sea{background:rgba(30,64,96,.25);color:var(--sea-bright);border:1px solid rgba(46,127,170,.3);}
+.badge-muted{background:var(--parchment);color:var(--ink-muted);border:1px solid var(--border);}
+
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.stat-tile{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;padding:16px 18px;position:relative;overflow:hidden;}
+.stat-tile::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0.5;}
+.stat-tile-val{font-family:'Cinzel',serif;font-size:26px;font-weight:700;color:var(--ink);line-height:1;}
+.stat-tile-lbl{font-family:'Cinzel',serif;font-size:8px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:2px;margin-top:5px;}
+
+.source-list{display:flex;flex-direction:column;gap:10px;}
+.source-card{background:var(--bg-input);border:1px solid var(--border);border-radius:2px;padding:14px 16px;display:flex;align-items:center;gap:14px;transition:var(--transition);}
+.source-card:hover{border-color:var(--border-hi);box-shadow:0 0 16px var(--gold-glow);}
+.source-sigil{width:40px;height:40px;border-radius:2px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:var(--parchment);}
+.source-info{flex:1;min-width:0;}
+.source-name{font-family:'Cinzel',serif;font-size:12px;font-weight:600;color:var(--ink);letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.source-path{font-family:'Fira Mono',monospace;font-size:10px;color:var(--ink-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px;}
+.source-stats{display:flex;gap:20px;align-items:center;flex-shrink:0;}
+.source-stat{text-align:center;}
+.source-stat-val{font-family:'Cinzel',serif;font-size:17px;font-weight:700;color:var(--ink);}
+.source-stat-lbl{font-family:'Cinzel',serif;font-size:7px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:1.5px;}
+.source-actions{display:flex;gap:6px;flex-shrink:0;}
+
+.path-bar{background:var(--bg-input);border:1px solid var(--border);border-radius:2px;padding:8px 14px;font-family:'Fira Mono',monospace;font-size:11px;color:var(--ink-muted);display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.path-bar-icon{color:var(--gold);flex-shrink:0;}
+.tree-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:2px;cursor:pointer;border:1px solid transparent;margin-bottom:2px;transition:all 0.15s;font-size:13px;font-family:'Lora',serif;}
+.tree-item:hover{background:var(--parchment);border-color:var(--border);}
+.tree-item-name{flex:1;color:var(--ink);}
+.tree-meta{font-family:'Fira Mono',monospace;font-size:10px;color:var(--ink-muted);}
+.policy-include{font-family:'Cinzel',serif;font-size:8px;font-weight:700;letter-spacing:1px;color:var(--green-nav);padding:2px 6px;border:1px solid rgba(74,158,107,.3);border-radius:1px;}
+.policy-exclude{font-family:'Cinzel',serif;font-size:8px;font-weight:700;letter-spacing:1px;color:var(--red-nav);padding:2px 6px;border:1px solid rgba(181,55,42,.3);border-radius:1px;}
+
+.search-bar{display:flex;gap:10px;margin-bottom:20px;}
+.search-input{flex:1;font-size:15px;font-family:'Lora',serif;padding:12px 16px;border-radius:2px;background:var(--bg-card);border:1px solid var(--border);color:var(--ink);outline:none;transition:var(--transition);}
+.search-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-glow);}
+.search-input::placeholder{color:var(--ink-muted);font-style:italic;}
+.search-result{display:flex;align-items:flex-start;gap:14px;padding:13px 16px;border:1px solid var(--border);border-radius:2px;margin-bottom:8px;background:var(--bg-card);transition:var(--transition);}
+.search-result:hover{border-color:var(--border-hi);background:var(--parchment);}
+.result-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.result-name{font-family:'Cinzel',serif;font-size:12px;font-weight:600;color:var(--ink);letter-spacing:0.3px;}
+.result-path{font-family:'Fira Mono',monospace;font-size:10px;color:var(--ink-muted);margin-top:3px;word-break:break-all;}
+.result-meta{margin-top:5px;display:flex;gap:10px;flex-wrap:wrap;}
+.result-meta span{font-size:10px;color:var(--ink-muted);font-style:italic;}
+
+.rule-row{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:2px;background:var(--bg-input);border:1px solid var(--border);margin-bottom:6px;font-size:12px;}
+.rule-prefix{flex:1;font-family:'Fira Mono',monospace;color:var(--ink);}
+
+.job-row{display:flex;align-items:center;gap:14px;padding:13px 16px;border:1px solid var(--border);border-radius:2px;margin-bottom:8px;background:var(--bg-card);transition:var(--transition);}
+.job-row:hover{border-color:var(--border-hi);}
+.job-sigil{font-size:22px;flex-shrink:0;}
+.job-info{flex:1;min-width:0;}
+.job-title{font-family:'Cinzel',serif;font-size:11px;font-weight:700;color:var(--ink);letter-spacing:0.5px;display:flex;align-items:center;gap:8px;}
+.job-subtitle{font-size:11px;color:var(--ink-muted);margin-top:3px;font-style:italic;}
+.progress-bar{height:3px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:2px;transition:width 0.5s ease;box-shadow:0 0 8px var(--gold-glow);}
+
+.empty-state{text-align:center;padding:60px 20px;color:var(--ink-muted);}
+.empty-sigil{font-size:44px;margin-bottom:14px;opacity:0.6;}
+.empty-title{font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--ink);letter-spacing:1px;margin-bottom:8px;}
+.empty-desc{font-size:12px;font-style:italic;line-height:1.7;max-width:340px;margin:0 auto;}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.tag{display:inline-block;padding:1px 7px;border-radius:1px;font-family:'Cinzel',serif;font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.tag-local{background:var(--sea);color:#aee;border:1px solid var(--sea-bright);}
+.tag-dropbox{background:rgba(30,50,120,.3);color:#9bc;border:1px solid rgba(60,100,200,.4);}
+
+#toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{background:var(--bg-card);border:1px solid var(--border-hi);border-radius:2px;padding:13px 18px;font-family:'Lora',serif;font-size:12px;font-style:italic;min-width:260px;box-shadow:0 4px 24px var(--shadow);animation:slideChart 0.3s ease;}
+.toast.success{border-left:3px solid var(--green-nav);}
+.toast.error{border-left:3px solid var(--red-nav);}
+.toast.info{border-left:3px solid var(--gold);}
+@keyframes slideChart{from{transform:translateX(80px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+::-webkit-scrollbar-thumb:hover{background:var(--gold-dim);}
+
+.portal-card{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--border);border-radius:2px;margin-bottom:8px;background:var(--bg-input);transition:var(--transition);}
+.portal-card:hover{border-color:var(--border-hi);}
+
+/* Space mode extras */
+@keyframes twinkle {
+  0%,100%{opacity:1;} 40%{opacity:0.4;} 70%{opacity:0.8;}
+}
+@keyframes scanline {
+  0%{transform:translateY(-100%);}
+  100%{transform:translateY(100vh);}
+}
+[data-theme="space"] .main::after {
+  content:'';
+  position:absolute;
+  left:0;right:0;top:0;height:2px;
+  background:linear-gradient(180deg,transparent,rgba(57,255,20,0.04),transparent);
+  animation:scanline 6s linear infinite;
+  pointer-events:none;
+  z-index:1;
+}
+[data-theme="space"] .card {
+  box-shadow:0 0 0 1px rgba(57,255,20,0.06),0 4px 24px rgba(0,0,0,0.7),inset 0 0 40px rgba(57,255,20,0.01);
+}
+[data-theme="space"] .card::before,[data-theme="space"] .card::after {
+  content:'[ ]';font-size:9px;color:var(--green-nav);opacity:0.3;font-family:'VT323',monospace;
+}
+[data-theme="space"] .stat-tile {
+  box-shadow:0 0 12px rgba(57,255,20,0.06);
+}
+[data-theme="space"] .nav-item.active {
+  box-shadow:inset 0 0 20px rgba(57,255,20,0.05);
+}
+[data-theme="space"] .source-card:hover {
+  border-color:var(--gold);
+  box-shadow:0 0 20px rgba(57,255,20,0.12),0 0 40px rgba(57,255,20,0.04);
+}
+[data-theme="space"] .search-result:hover {
+  box-shadow:0 0 12px rgba(57,255,20,0.08);
+}
+[data-theme="space"] .btn-primary:hover {
+  box-shadow:0 0 20px rgba(57,255,20,0.3);
+}
+[data-theme="space"] .progress-fill {
+  animation:pulse-beacon 1.5s ease-in-out infinite;
+}
+
+/* ── Path picker & drop zone ── */
+.path-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.path-input-row input {
+  flex: 1;
+}
+.path-browse-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 8px 14px;
+}
+
+.drop-zone {
+  margin-top: 10px;
+  border: 1.5px dashed var(--border);
+  border-radius: 4px;
+  padding: 18px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+  background: var(--bg-input);
+  position: relative;
+}
+.drop-zone:hover,
+.drop-zone.drag-over {
+  border-color: var(--gold);
+  background: var(--gold-glow);
+}
+.drop-zone.drag-over {
+  box-shadow: 0 0 20px var(--gold-glow);
+}
+.drop-zone.drop-success {
+  border-color: var(--green-nav);
+  background: rgba(74,158,107,0.08);
+}
+[data-theme="space"] .drop-zone.drag-over {
+  border-color: var(--green-nav);
+  box-shadow: 0 0 24px rgba(57,255,20,0.2);
+}
+[data-theme="space"] .drop-zone.drop-success {
+  border-color: var(--green-nav);
+  box-shadow: 0 0 16px rgba(57,255,20,0.12);
+}
+
+.drop-zone-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+}
+.drop-zone-icon {
+  font-size: 26px;
+  line-height: 1;
+  transition: transform 0.2s;
+}
+.drop-zone.drag-over .drop-zone-icon {
+  transform: scale(1.2) translateY(-2px);
+}
+.drop-zone-label {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+}
+[data-theme="space"] .drop-zone-label { font-family: 'VT323', monospace; font-size: 14px; }
+.drop-zone.drag-over .drop-zone-label,
+.drop-zone.drop-success .drop-zone-label { color: var(--ink); }
+.drop-zone-sub {
+  font-size: 10px;
+  color: var(--ink-muted);
+  font-style: italic;
+}
+[data-theme="space"] .drop-zone-sub { font-family: 'VT323', monospace; font-style: normal; font-size: 12px; }
+
+.path-hint {
+  margin-top: 7px;
+  font-family: 'Fira Mono', monospace;
+  font-size: 10px;
+  color: var(--ink-muted);
+  padding: 6px 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  word-break: break-all;
+  line-height: 1.5;
+}
+.path-hint .hint-ok  { color: var(--green-nav); }
+.path-hint .hint-warn { color: var(--yellow, #d29922); }
+
+</style>
+</head>
+<body>
+<canvas id="chart-canvas"></canvas>
+
+<nav class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">Deep42</div>
+    <div class="logo-sub" id="logo-sub-text">Don't Panic. The Answer is 42.</div>
+    <div id="logo-sigil" class="logo-compass"><svg width="32" height="32" viewBox="0 0 32 32">
+      <circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.5"/>
+      <polygon points="16,2 18,16 16,14 14,16" fill="#b5372a" opacity="0.8"/>
+      <polygon points="16,30 18,16 16,18 14,16" fill="currentColor" opacity="0.5"/>
+      <polygon points="2,16 16,14 14,16 16,18" fill="currentColor" opacity="0.5"/>
+      <polygon points="30,16 16,14 18,16 16,18" fill="#b5372a" opacity="0.5"/>
+      <circle cx="16" cy="16" r="2" fill="#c9a84c" opacity="0.9"/>
+    </svg></div>
+  </div>
+  <div class="nav">
+    <div class="nav-section">Catalog</div>
+    <div class="nav-item active" onclick="showPanel('dashboard')"><span class="nav-rune">⊕</span>The Chart</div>
+    <div class="nav-item" onclick="showPanel('sources')"><span class="nav-rune">⚓</span>Sources</div>
+    <div class="nav-item" onclick="showPanel('browse')"><span class="nav-rune">🗺</span>Browse</div>
+    <div class="nav-item" onclick="showPanel('search')"><span class="nav-rune">🔭</span>Search</div>
+    <div class="nav-section">Navigation</div>
+    <div class="nav-item" onclick="showPanel('rules')"><span class="nav-rune">⚖</span>Rules</div>
+    <div class="nav-item" onclick="showPanel('jobs')"><span class="nav-rune">⛵</span>Expeditions</div>
+    <div class="nav-section">Ports</div>
+    <div class="nav-item" onclick="showPanel('portals')"><span class="nav-rune">☁</span>Portals</div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="status-beacon">
+      <div class="beacon-dot" id="beacon-dot"></div>
+      <span id="status-text">Anchoring…</span>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle day/night"><span id="theme-icon">🚀</span></button>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <span class="page-title" id="topbar-title">THE CHART</span>
+    <div class="topbar-div"></div>
+    <span class="page-subtitle" id="topbar-sub">Overview of your mapped universe</span>
+    <div class="spacer"></div>
+  </div>
+  <div class="content">
+
+    <div class="panel active" id="panel-dashboard">
+      <div class="stat-row">
+        <div class="stat-tile"><div class="stat-tile-val" id="ds-sources">—</div><div class="stat-tile-lbl">Sources</div></div>
+        <div class="stat-tile"><div class="stat-tile-val" id="ds-files">—</div><div class="stat-tile-lbl">Files Mapped</div></div>
+        <div class="stat-tile"><div class="stat-tile-val" id="ds-folders">—</div><div class="stat-tile-lbl">Territories</div></div>
+        <div class="stat-tile"><div class="stat-tile-val" id="ds-size">—</div><div class="stat-tile-lbl">Total Volume</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">⚓ Known Sources</span><button class="btn btn-ghost" onclick="showPanel('sources')" style="padding:4px 10px;">View All</button></div>
+          <div class="card-body" id="dash-sources-list"><div class="empty-state" style="padding:24px 0;"><div class="empty-sigil" style="font-size:26px;">⚓</div><div class="empty-desc">No sources charted yet.</div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">⛵ Recent Expeditions</span><button class="btn btn-ghost" onclick="showPanel('jobs')" style="padding:4px 10px;">View All</button></div>
+          <div class="card-body" id="dash-jobs-list"><div class="empty-state" style="padding:24px 0;"><div class="empty-sigil" style="font-size:26px;">⛵</div><div class="empty-desc">No expeditions launched yet.</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-sources">
+      <div class="card">
+        <div class="card-header"><span class="card-title">⚓ Chart New Source</span></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group"><label>Source Type</label><select id="src-type" onchange="onSourceTypeChange()"><option value="local_fs">Local Filesystem</option><option value="dropbox_user">Dropbox Personal</option><option value="dropbox_team">Dropbox Business</option></select></div>
+            <div class="form-group"><label>Name</label><input type="text" id="src-name" placeholder="e.g. The Work Archives"></div>
+          </div>
+          <div id="local-fields" style="margin-top:14px;">
+            <div class="form-group">
+              <label>Root Path</label>
+              <div class="path-input-row">
+                <input type="text" id="src-path" placeholder="/Users/you/Documents" autocomplete="off" spellcheck="false">
+                <button class="btn btn-ghost path-browse-btn" onclick="openFolderModal()" type="button" title="Browse filesystem">
+                  <span>📂</span> Browse
+                </button>
+              </div>
+              <div class="drop-zone" id="drop-zone"
+                ondragover="onDragOver(event)"
+                ondragleave="onDragLeave(event)"
+                ondrop="onFolderDrop(event)">
+                <div class="drop-zone-inner">
+                  <span class="drop-zone-icon" id="drop-zone-icon">📁</span>
+                  <span class="drop-zone-label" id="drop-zone-label">Drop a folder here</span>
+                  <span class="drop-zone-sub" id="drop-zone-sub">from Finder or File Explorer</span>
+                </div>
+              </div>
+              <div class="path-hint" id="path-hint" style="display:none"></div>
+            </div>
+          </div>
+          <div id="dropbox-fields" style="display:none;margin-top:14px;">
+            <div class="form-group">
+              <label>Connected Portal</label>
+              <select id="src-cred" onchange="onCredChange()"><option value="">— Connect in Portals tab first —</option></select>
+            </div>
+            <div class="form-group" style="margin-top:10px;">
+              <label>Cloud Root Path (optional)</label>
+              <div class="path-input-row">
+                <input type="text" id="src-cloud-root" placeholder="Leave empty for full Dropbox" autocomplete="off" spellcheck="false">
+                <button class="btn btn-ghost path-browse-btn" id="dbx-browse-btn" onclick="openDropboxModal()" type="button" title="Browse Dropbox folders" disabled>
+                  <span>☁</span> Browse
+                </button>
+              </div>
+              <div style="font-size:10px;color:var(--ink-muted);margin-top:5px;font-style:italic;">Leave empty to index your whole Dropbox, or browse to pick a subfolder.</div>
+            </div>
+          </div>
+          <div class="form-grid" style="margin-top:14px;">
+            <div class="form-group"><label>Default Policy</label><select id="src-policy"><option value="include">Include all (then exclude exceptions)</option><option value="exclude">Exclude all (then include exceptions)</option></select></div>
+            <div class="form-group"><label>Notes</label><input type="text" id="src-notes" placeholder="Field notes…"></div>
+          </div>
+          <div style="margin-top:16px;"><button class="btn btn-primary" onclick="createSource()">⚓ Chart This Source</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Known Territories</span><button class="btn btn-ghost" onclick="loadSources()" style="padding:4px 10px;">↺ Resurvey</button></div>
+        <div class="card-body"><div class="source-list" id="source-list"><div class="empty-state"><div class="empty-sigil">🗺</div><div class="empty-title">Terra Incognita</div><div class="empty-desc">No territories charted. Add a local folder or cloud portal.</div></div></div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-browse">
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-body" style="padding:14px 18px;">
+          <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+            <div class="form-group" style="flex:1;min-width:200px;"><label>Navigate Source</label><select id="browse-source" onchange="onBrowseSourceChange()"><option value="">— Choose a territory —</option></select></div>
+            <button class="btn btn-ghost" onclick="browseUp()">↑ Up</button>
+            <button class="btn btn-ghost" onclick="browseRoot()">⌂ Origin</button>
+          </div>
+          <div class="path-bar" style="margin-top:12px;margin-bottom:0;"><span class="path-bar-icon">◈</span><span id="browse-path">/</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title" id="browse-count">📍 Territory Contents</span>
+          <div style="display:flex;gap:6px;"><span class="badge badge-green" style="display:none;" id="browse-include-badge"></span><span class="badge badge-red" style="display:none;" id="browse-exclude-badge"></span></div>
+        </div>
+        <div class="card-body" style="padding:8px 12px;"><div id="browse-tree"><div class="empty-state"><div class="empty-sigil">🗺</div><div class="empty-title">Select a Source</div><div class="empty-desc">Choose a territory above. Portal sources support live browsing. Local sources require a scan first.</div></div></div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-search">
+      <div class="search-bar">
+        <input class="search-input" type="text" id="search-q" placeholder="Seek by name across all charted territory…" oninput="debounceSearch()" onkeydown="if(event.key==='Enter')doSearch()">
+        <select id="search-source" style="width:220px;"><option value="">All territories</option></select>
+        <button class="btn btn-primary" onclick="doSearch()">🔭 Seek</button>
+      </div>
+      <div id="search-results"><div class="empty-state"><div class="empty-sigil">🔭</div><div class="empty-title">The Answer Is In Your Files</div><div class="empty-desc">Enter a filename or fragment. Deep42 searches across all indexed territories. The treasure has been there all along.</div></div></div>
+    </div>
+
+    <div class="panel" id="panel-rules">
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-header"><span class="card-title">⚖ Decree New Rule</span></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group"><label>Territory</label><select id="rule-source"><option value="">— Choose source —</option></select></div>
+            <div class="form-group"><label>Path Prefix</label><input type="text" id="rule-prefix" placeholder="/Archive or /Contracts/Old"></div>
+            <div class="form-group"><label>Decree</label><select id="rule-policy"><option value="exclude">Exclude — Leave unmapped</option><option value="include">Include — Chart this region</option></select></div>
+          </div>
+          <div style="margin-top:14px;"><button class="btn btn-primary" onclick="createRule()">⚖ Issue Decree</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Active Decrees</span>
+          <select id="rules-filter-source" onchange="loadRules()" style="font-size:11px;padding:5px 10px;width:auto;font-family:'Cinzel',serif;"><option value="">All territories</option></select>
+        </div>
+        <div class="card-body" id="rules-list"><div class="empty-state"><div class="empty-sigil">⚖</div><div class="empty-title">No Decrees Issued</div><div class="empty-desc">Rules override the default policy for specific path prefixes. Deeper paths take precedence. Exclusions beat inclusions on ties.</div></div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-jobs">
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-header"><span class="card-title">⛵ Launch Expedition</span></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group"><label>Destination</label><select id="scan-source"><option value="">— Choose source —</option></select></div>
+            <div class="form-group"><label>Expedition Mode</label><select id="scan-mode"><option value="manual">Full Survey</option><option value="incremental">Incremental (Dropbox only)</option></select></div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:10px;">
+            <button class="btn btn-primary" onclick="runScan()">⛵ Set Sail</button>
+            <button class="btn btn-ghost" onclick="loadJobs()">↺ Refresh Logs</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Expedition Logs</span></div>
+        <div class="card-body" id="jobs-list"><div class="empty-state"><div class="empty-sigil">⛵</div><div class="empty-title">No Expeditions Yet</div><div class="empty-desc">Launch a scan expedition above to begin indexing your territories.</div></div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-portals">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header"><span class="card-title">☁ Open a Portal</span></div>
+        <div class="card-body">
+          <p style="color:var(--ink-muted);font-size:12px;margin-bottom:18px;line-height:1.8;font-style:italic;">Connect your Dropbox accounts. All tokens are stored locally — no content traverses the portal. Requires <code style="color:var(--gold);font-family:'Fira Mono',monospace;">DROPBOX_APP_KEY</code> and <code style="color:var(--gold);font-family:'Fira Mono',monospace;">DROPBOX_APP_SECRET</code> in your environment.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="startDropboxAuth('personal')">☁ Personal Dropbox</button>
+            <button class="btn btn-ghost" onclick="startDropboxAuth('business')">☁ Business Dropbox</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Anchored Portals</span><button class="btn btn-ghost" onclick="loadPortals()" style="padding:4px 10px;">↺ Refresh</button></div>
+        <div class="card-body" id="portals-list"><div class="empty-state"><div class="empty-sigil">☁</div><div class="empty-title">No Portals Anchored</div><div class="empty-desc">Open a Dropbox portal above, then add it as a source territory.</div></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Folder Picker Modal -->
+<div id="folder-modal" style="display:none;position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);">
+  <div style="background:var(--bg-card);border:1px solid var(--border-hi);border-radius:4px;width:520px;max-width:94vw;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+      <span style="font-size:18px;">📂</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-family:'Cinzel',serif;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;">Select Folder</div>
+        <div id="fm-current-path" style="font-family:'Fira Mono',monospace;font-size:10px;color:var(--ink-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+      </div>
+      <button onclick="closeFolderModal()" style="background:none;border:none;color:var(--ink-muted);font-size:20px;cursor:pointer;padding:4px;line-height:1;">✕</button>
+    </div>
+    <div style="padding:8px;border-bottom:1px solid var(--border);display:flex;gap:6px;">
+      <button class="btn btn-ghost" onclick="fsModalNav('~')" style="padding:5px 10px;font-size:10px;">⌂ Home</button>
+      <button class="btn btn-ghost" id="fm-up-btn" onclick="fsModalUp()" style="padding:5px 10px;font-size:10px;">↑ Up</button>
+      <input id="fm-path-input" type="text" style="flex:1;padding:5px 10px;font-size:11px;font-family:'Fira Mono',monospace;" placeholder="/type/a/path" onkeydown="if(event.key==='Enter')fsModalNav(this.value)">
+      <button class="btn btn-ghost" onclick="fsModalNav(document.getElementById('fm-path-input').value)" style="padding:5px 10px;font-size:10px;">→ Go</button>
+    </div>
+    <div id="fm-list" style="flex:1;overflow-y:auto;padding:6px;min-height:200px;max-height:380px;">
+      <div style="padding:20px;text-align:center;color:var(--ink-muted);font-style:italic;"><span class="spinner"></span></div>
+    </div>
+    <div style="padding:14px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <div id="fm-selected-label" style="font-family:'Fira Mono',monospace;font-size:10px;color:var(--ink-muted);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">No folder selected</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost" onclick="closeFolderModal()" style="padding:7px 14px;">Cancel</button>
+        <button class="btn btn-primary" id="fm-select-btn" onclick="confirmFolderModal()" disabled style="padding:7px 14px;">Select This Folder</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Dropbox Folder Picker Modal -->
+<div id="dbx-modal" style="display:none;position:fixed;inset:0;z-index:2000;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);">
+  <div style="background:var(--bg-card);border:1px solid var(--border-hi);border-radius:4px;width:520px;max-width:94vw;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+      <span style="font-size:18px;">☁</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-family:'Cinzel',serif;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;">Browse Dropbox</div>
+        <div id="dbxm-current-path" style="font-family:'Fira Mono',monospace;font-size:10px;color:var(--ink-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">/</div>
+      </div>
+      <button onclick="closeDropboxModal()" style="background:none;border:none;color:var(--ink-muted);font-size:20px;cursor:pointer;padding:4px;line-height:1;">✕</button>
+    </div>
+    <div style="padding:8px;border-bottom:1px solid var(--border);display:flex;gap:6px;">
+      <button class="btn btn-ghost" onclick="dbxModalNav('')" style="padding:5px 10px;font-size:10px;">&#8962; Root</button>
+      <button class="btn btn-ghost" id="dbxm-up-btn" onclick="dbxModalUp()" style="padding:5px 10px;font-size:10px;">&uarr; Up</button>
+      <input id="dbxm-path-input" type="text" style="flex:1;padding:5px 10px;font-size:11px;font-family:'Fira Mono',monospace;" placeholder="/Work/Projects" onkeydown="if(event.key==='Enter')dbxModalNav(this.value)">
+      <button class="btn btn-ghost" onclick="dbxModalNav(document.getElementById('dbxm-path-input').value)" style="padding:5px 10px;font-size:10px;">&rarr; Go</button>
+    </div>
+    <div id="dbxm-list" style="flex:1;overflow-y:auto;padding:6px;min-height:200px;max-height:380px;">
+      <div style="padding:20px;text-align:center;color:var(--ink-muted);"><span class="spinner"></span></div>
+    </div>
+    <div style="padding:14px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <div id="dbxm-selected-label" style="font-family:'Fira Mono',monospace;font-size:10px;color:var(--ink-muted);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Select a folder — or leave at root for full Dropbox</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost" onclick="closeDropboxModal()" style="padding:7px 14px;">Cancel</button>
+        <button class="btn btn-ghost" onclick="confirmDropboxModal('')" style="padding:7px 14px;">Use Full Dropbox</button>
+        <button class="btn btn-primary" id="dbxm-select-btn" onclick="confirmDropboxModal()" disabled style="padding:7px 14px;">Select Folder</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+const canvas=document.getElementById('chart-canvas');
+const ctx=canvas.getContext('2d');
+let W,H;
+function resizeCanvas(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;drawChart();}
+function getTheme(){return document.documentElement.getAttribute('data-theme');}
+function isDark(){return getTheme()==='dark';}
+function isSpace(){return getTheme()==='space';}
+
+function drawChart(){
+  ctx.clearRect(0,0,W,H);
+  if(isSpace()){drawSpace();return;}
+  const d=isDark();
+  const gc=d?'rgba(161,124,60,0.07)':'rgba(101,74,20,0.09)';
+  const rc=d?'rgba(201,160,76,0.045)':'rgba(139,105,20,0.06)';
+  const rose=d?'rgba(201,160,76,0.1)':'rgba(139,105,20,0.13)';
+  const northC=d?'rgba(181,55,42,0.2)':'rgba(139,34,24,0.18)';
+  const tc=d?'rgba(201,160,76,0.14)':'rgba(101,74,20,0.2)';
+  const bc=d?'rgba(161,124,60,0.12)':'rgba(101,74,20,0.15)';
+
+  /* Grid */
+  ctx.strokeStyle=gc;ctx.lineWidth=0.8;
+  for(let i=0;i<=20;i++){const x=(W/20)*i;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let i=0;i<=14;i++){const y=(H/14)*i;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  /* Degree labels */
+  ctx.fillStyle=tc;ctx.font='10px "Cinzel",serif';ctx.textAlign='center';
+  for(let i=2;i<20;i+=2){ctx.fillText(Math.round((i/20)*360)+'°',(W/20)*i,13);}
+  ctx.textAlign='right';
+  for(let i=2;i<14;i+=2){ctx.fillText((90-Math.round((i/14)*180))+'°',W-6,(H/14)*i+4);}
+
+  /* Rhumb lines */
+  const ox=W*0.72,oy=H*0.54;
+  ctx.strokeStyle=rc;ctx.lineWidth=0.55;
+  for(let i=0;i<32;i++){
+    const a=(i/32)*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(ox,oy);
+    ctx.lineTo(ox+Math.cos(a)*Math.max(W,H)*1.2,oy+Math.sin(a)*Math.max(W,H)*1.2);
+    ctx.stroke();
+  }
+
+  /* Main compass rose */
+  drawRose(ox,oy,175,rose,northC,d,false);
+  /* Small accent compass */
+  drawRose(W*0.13,H*0.8,65,rose,northC,d,true);
+  /* Tiny third rose */
+  drawRose(W*0.88,H*0.18,45,rose,northC,d,true);
+
+  /* Decorative frame */
+  const m=14;
+  ctx.strokeStyle=bc;ctx.lineWidth=1;ctx.strokeRect(m,m,W-m*2,H-m*2);
+  ctx.strokeStyle=d?'rgba(161,124,60,0.05)':'rgba(101,74,20,0.06)';
+  ctx.lineWidth=0.5;ctx.strokeRect(m+5,m+5,W-(m+5)*2,H-(m+5)*2);
+
+  /* Corner brackets */
+  [[m+2,m+2,1,1],[W-m-2,m+2,-1,1],[m+2,H-m-2,1,-1],[W-m-2,H-m-2,-1,-1]].forEach(([x,y,sx,sy])=>{
+    ctx.save();ctx.strokeStyle=bc;ctx.lineWidth=1;ctx.translate(x,y);ctx.scale(sx,sy);
+    ctx.beginPath();ctx.moveTo(0,22);ctx.lineTo(0,0);ctx.lineTo(22,0);ctx.stroke();
+    ctx.beginPath();ctx.arc(0,0,5,0,Math.PI/2);ctx.stroke();
+    ctx.restore();
+  });
+
+  /* Flavor text */
+  ctx.save();ctx.font='italic 10px "Lora",serif';ctx.fillStyle=tc;ctx.globalAlpha=0.8;
+  ctx.textAlign='center';
+  ctx.fillText('Hic svnt dracones',W*0.15,H*0.1);
+  ctx.fillText('Terra Incognita',W*0.87,H*0.93);
+  ctx.restore();
+
+  /* Vignette */
+  const vig=ctx.createRadialGradient(W/2,H/2,H*0.28,W/2,H/2,H*0.88);
+  vig.addColorStop(0,'transparent');
+  vig.addColorStop(1,d?'rgba(0,0,0,0.52)':'rgba(60,40,10,0.22)');
+  ctx.fillStyle=vig;ctx.fillRect(0,0,W,H);
+}
+
+function drawRose(cx,cy,r,fill,northFill,dark,small){
+  ctx.save();ctx.translate(cx,cy);
+  ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);
+  ctx.strokeStyle=dark?'rgba(201,160,76,0.11)':'rgba(139,105,20,0.13)';ctx.lineWidth=0.8;ctx.stroke();
+  ctx.beginPath();ctx.arc(0,0,r*0.35,0,Math.PI*2);
+  ctx.strokeStyle=dark?'rgba(201,160,76,0.09)':'rgba(139,105,20,0.11)';ctx.lineWidth=0.6;ctx.stroke();
+  for(let i=0;i<8;i++){
+    const a=(i/8)*Math.PI*2-Math.PI/2,card=i%2===0,len=card?r*0.94:r*0.62,w=card?r*0.11:r*0.065;
+    ctx.save();ctx.rotate(a);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(-w,r*0.22);ctx.lineTo(0,-len);ctx.lineTo(w,r*0.22);ctx.closePath();
+    ctx.fillStyle=i===0?northFill:fill;ctx.fill();
+    ctx.strokeStyle=dark?'rgba(201,160,76,0.18)':'rgba(139,105,20,0.2)';ctx.lineWidth=0.5;ctx.stroke();
+    ctx.restore();
+  }
+  ctx.beginPath();ctx.arc(0,0,r*0.065,0,Math.PI*2);
+  ctx.fillStyle=dark?'rgba(201,160,76,0.5)':'rgba(139,105,20,0.55)';ctx.fill();
+  if(!small){
+    ctx.font=`bold ${Math.round(r*0.09)+2}px "Cinzel",serif`;ctx.textAlign='center';
+    ctx.fillStyle=dark?'rgba(201,160,76,0.32)':'rgba(139,105,20,0.42)';
+    [['N',0,-(r+15)],['E',r+15,4],['S',0,r+19],['W',-(r+15),4]].forEach(([l,x,y])=>ctx.fillText(l,x,y));
+  }
+  ctx.restore();
+}
+
+
+function drawSpace(){
+  /* ── Starfield ── */
+  const stars=[];
+  // Seed deterministically so it doesn't shimmer on resize
+  let rng=1;function rand(){rng=(rng*16807+0)%2147483647;return(rng-1)/2147483646;}
+  for(let i=0;i<480;i++){
+    stars.push({x:rand()*W,y:rand()*H,r:rand()*1.4+0.2,a:rand()*0.7+0.3,blue:rand()>0.75});
+  }
+  // Large bright stars
+  for(let i=0;i<24;i++) stars.push({x:rand()*W,y:rand()*H,r:rand()*2.2+1.2,a:rand()*0.5+0.5,blue:rand()>0.5,bright:true});
+
+  stars.forEach(s=>{
+    ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    const col=s.blue?`rgba(150,220,255,${s.a})`:`rgba(255,255,255,${s.a})`;
+    ctx.fillStyle=col;ctx.fill();
+    if(s.bright){
+      const g=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*6);
+      g.addColorStop(0,s.blue?'rgba(150,220,255,0.25)':'rgba(255,255,255,0.2)');
+      g.addColorStop(1,'transparent');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(s.x,s.y,s.r*6,0,Math.PI*2);ctx.fill();
+    }
+  });
+
+  /* ── Nebula clouds ── */
+  [[W*0.22,H*0.3,200,'rgba(80,20,140,0.06)'],[W*0.75,H*0.65,280,'rgba(0,60,140,0.07)'],
+   [W*0.55,H*0.2,180,'rgba(140,0,80,0.05)'],[W*0.1,H*0.75,150,'rgba(0,100,120,0.06)']
+  ].forEach(([nx,ny,nr,nc])=>{
+    const g=ctx.createRadialGradient(nx,ny,0,nx,ny,nr);
+    g.addColorStop(0,nc);g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(nx,ny,nr,0,Math.PI*2);ctx.fill();
+  });
+
+  /* ── Spiral galaxy ── */
+  const gx=W*0.78,gy=H*0.22,arms=3;
+  for(let arm=0;arm<arms;arm++){
+    const offset=(arm/arms)*Math.PI*2;
+    for(let t=0;t<6*Math.PI;t+=0.04){
+      const r=t*14,a=t+offset;
+      const sx=gx+Math.cos(a)*r,sy=gy+Math.sin(a)*r*0.45;
+      const fade=Math.max(0,1-t/(6*Math.PI));
+      ctx.beginPath();ctx.arc(sx,sy,0.8,0,Math.PI*2);
+      ctx.fillStyle=`rgba(180,160,255,${fade*0.25})`;ctx.fill();
+    }
+  }
+  // Galaxy core glow
+  const gc2=ctx.createRadialGradient(gx,gy,0,gx,gy,45);
+  gc2.addColorStop(0,'rgba(220,200,255,0.4)');gc2.addColorStop(1,'transparent');
+  ctx.fillStyle=gc2;ctx.beginPath();ctx.arc(gx,gy,45,0,Math.PI*2);ctx.fill();
+
+  /* ── Space grid (cyan, very faint) ── */
+  ctx.strokeStyle='rgba(0,207,255,0.05)';ctx.lineWidth=0.6;
+  for(let i=0;i<=20;i++){const x=(W/20)*i;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let i=0;i<=14;i++){const y=(H/14)*i;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  /* ── Trajectory lines from Earth (lower-left area) ── */
+  const ex=W*0.08,ey=H*0.85;
+  const targets=[[W*0.78,H*0.22],[W*0.55,H*0.45],[W*0.88,H*0.7]];
+  targets.forEach(([tx,ty])=>{
+    ctx.setLineDash([4,10]);
+    ctx.strokeStyle='rgba(57,255,20,0.08)';ctx.lineWidth=0.8;
+    ctx.beginPath();ctx.moveTo(ex,ey);ctx.lineTo(tx,ty);ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  /* ── "DON'T PANIC" watermark ── */
+  ctx.save();
+  ctx.font='bold 72px "VT323",monospace';
+  ctx.textAlign='center';ctx.globalAlpha=0.04;
+  ctx.fillStyle='#39ff14';
+  ctx.fillText("DON'T PANIC",W/2,H/2+20);
+  ctx.globalAlpha=0.06;
+  ctx.font='bold 140px "VT323",monospace';
+  ctx.fillStyle='#39ff14';
+  ctx.fillText('42',W*0.85,H*0.9);
+  ctx.restore();
+
+  /* ── Coordinate labels (cyan) ── */
+  ctx.fillStyle='rgba(0,207,255,0.18)';ctx.font='10px "VT323",monospace';ctx.textAlign='center';
+  for(let i=2;i<20;i+=2) ctx.fillText(Math.round((i/20)*360)+'°',(W/20)*i,13);
+  ctx.textAlign='right';
+  for(let i=2;i<14;i+=2) ctx.fillText((90-Math.round((i/14)*180))+'°',W-6,(H/14)*i+4);
+
+  /* ── Outer frame ── */
+  ctx.strokeStyle='rgba(57,255,20,0.1)';ctx.lineWidth=1;
+  const m=14;ctx.strokeRect(m,m,W-m*2,H-m*2);
+  ctx.strokeStyle='rgba(0,207,255,0.05)';ctx.lineWidth=0.5;
+  ctx.strokeRect(m+5,m+5,W-(m+5)*2,H-(m+5)*2);
+
+  /* ── Corner brackets (neon green) ── */
+  [[m+2,m+2,1,1],[W-m-2,m+2,-1,1],[m+2,H-m-2,1,-1],[W-m-2,H-m-2,-1,-1]].forEach(([x,y,sx,sy])=>{
+    ctx.save();ctx.strokeStyle='rgba(57,255,20,0.18)';ctx.lineWidth=1;ctx.translate(x,y);ctx.scale(sx,sy);
+    ctx.beginPath();ctx.moveTo(0,22);ctx.lineTo(0,0);ctx.lineTo(22,0);ctx.stroke();
+    ctx.beginPath();ctx.arc(0,0,5,0,Math.PI/2);ctx.stroke();
+    ctx.restore();
+  });
+
+  /* ── Flavor text ── */
+  ctx.save();ctx.font='13px "VT323",monospace';ctx.fillStyle='rgba(57,255,20,0.2)';
+  ctx.textAlign='center';ctx.globalAlpha=0.9;
+  ctx.fillText('MOSTLY HARMLESS',W*0.14,H*0.09);
+  ctx.fillText('DEEP THOUGHT ONLINE',W*0.87,H*0.95);
+  ctx.restore();
+
+  /* ── Vignette ── */
+  const vig=ctx.createRadialGradient(W/2,H/2,H*0.25,W/2,H/2,H*0.9);
+  vig.addColorStop(0,'transparent');vig.addColorStop(1,'rgba(0,0,0,0.7)');
+  ctx.fillStyle=vig;ctx.fillRect(0,0,W,H);
+}
+window.addEventListener('resize',resizeCanvas);
+resizeCanvas();
+
+
+const SPACE_NAV = {
+  dashboard:['GALAXY MAP','Status of all indexed sectors'],
+  sources:['SECTORS','Register and manage data sectors'],
+  browse:['HITCHHIKE','Navigate the indexed file tree'],
+  search:['SEEK THE ANSWER','The answer is somewhere in your files'],
+  rules:['PROTOCOLS','Decrees governing sector inclusion'],
+  jobs:['EXPEDITIONS','Active scan missions and logs'],
+  portals:['PORTALS','Connected cloud gateways'],
+};
+const CHART_NAV = {
+  dashboard:['THE CHART','Overview of your mapped universe'],
+  sources:['SOURCES','Chart and manage your data territories'],
+  browse:['BROWSE','Navigate the indexed file tree'],
+  search:['SEARCH','Seek any file across all territories'],
+  rules:['RULES','Decrees governing inclusion and exclusion'],
+  jobs:['EXPEDITIONS','Scan journeys and their logs'],
+  portals:['PORTALS','Connected cloud gateways'],
+};
+
+function getNavMeta(){return isSpace()?SPACE_NAV:CHART_NAV;}
+
+const SPACE_NAV_LABELS = {
+  dashboard:['⊕','Galaxy Map'],sources:['🛸','Sectors'],browse:['🚀','Hitchhike'],
+  search:['📡','Seek'],rules:['⚖','Protocols'],jobs:['🛰','Expeditions'],portals:['☁','Portals'],
+};
+const CHART_NAV_LABELS = {
+  dashboard:['⊕','The Chart'],sources:['⚓','Sources'],browse:['🗺','Browse'],
+  search:['🔭','Search'],rules:['⚖','Rules'],jobs:['⛵','Expeditions'],portals:['☁','Portals'],
+};
+
+function applyNavLabels(){
+  const labels=isSpace()?SPACE_NAV_LABELS:CHART_NAV_LABELS;
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    const onclick=el.getAttribute('onclick')||'';
+    const m=onclick.match(/'(\w+)'/);
+    if(!m)return;
+    const key=m[1];
+    if(labels[key]){
+      el.innerHTML=`<span class="nav-rune">${labels[key][0]}</span>${labels[key][1]}`;
+    }
+  });
+  const sub=document.getElementById('logo-sub-text');
+  if(sub) sub.textContent=isSpace()?'Don\'t Panic. The Answer is 42.':'Chart Your Universe';
+  // Swap compass sigil
+  const cs=document.getElementById('logo-sigil');
+  if(cs) cs.innerHTML=isSpace()?`
+    <svg width="32" height="32" viewBox="0 0 32 32">
+      <circle cx="16" cy="16" r="8" fill="none" stroke="#39ff14" stroke-width="1" opacity="0.7"/>
+      <ellipse cx="16" cy="16" rx="14" ry="5" fill="none" stroke="#00cfff" stroke-width="0.8" opacity="0.5" transform="rotate(-20,16,16)"/>
+      <circle cx="16" cy="16" r="3" fill="#39ff14" opacity="0.6"/>
+      <circle cx="24" cy="10" r="1" fill="white" opacity="0.8"/>
+      <circle cx="6" cy="22" r="0.8" fill="white" opacity="0.6"/>
+    </svg>`:
+    `<svg width="32" height="32" viewBox="0 0 32 32">
+      <circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.5"/>
+      <polygon points="16,2 18,16 16,14 14,16" fill="#b5372a" opacity="0.8"/>
+      <polygon points="16,30 18,16 16,18 14,16" fill="currentColor" opacity="0.5"/>
+      <polygon points="2,16 16,14 14,16 16,18" fill="currentColor" opacity="0.5"/>
+      <polygon points="30,16 16,14 18,16 16,18" fill="#b5372a" opacity="0.5"/>
+      <circle cx="16" cy="16" r="2" fill="#c9a84c" opacity="0.9"/>
+    </svg></div>`;
+}
+
+function toggleTheme(){
+  const cur=getTheme();
+  const next={dark:'light',light:'space',space:'dark'}[cur]||'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  const icons={dark:'🌙',light:'🚀',space:'☀'};
+  document.getElementById('theme-icon').textContent=icons[next];
+  applyNavLabels();
+  drawChart();
+}
+
+const API='';
+// PANEL_META replaced by dynamic getNavMeta()
+
+function showPanel(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const panel=document.getElementById('panel-'+name);
+  if(panel)panel.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{if((n.getAttribute('onclick')||'').includes("'"+name+"'"))n.classList.add('active');});
+  const nav=getNavMeta();const [t,s]=(nav[name])||[name,''];
+  document.getElementById('topbar-title').textContent=t;
+  document.getElementById('topbar-sub').textContent=s;
+  if(name==='dashboard')loadDashboard();
+  if(name==='sources')loadSources();
+  if(name==='browse')loadBrowseSources();
+  if(name==='search')loadSearchSources();
+  if(name==='rules')loadRules();
+  if(name==='jobs')loadJobs();
+  if(name==='portals')loadPortals();
+}
+
+async function api(method,path,body){
+  const opts={method,headers:{'Content-Type':'application/json'}};
+  if(body)opts.body=JSON.stringify(body);
+  const res=await fetch(API+path,opts);
+  if(!res.ok){const err=await res.json().catch(()=>({detail:res.statusText}));throw new Error(err.detail||res.statusText);}
+  return res.json();
+}
+const get=path=>api('GET',path);
+const post=(path,body)=>api('POST',path,body);
+const del=path=>api('DELETE',path);
+
+function toast(msg,type='info',dur=3500){
+  const c=document.getElementById('toast-container'),t=document.createElement('div');
+  t.className=`toast ${type}`;
+  const icons=isSpace()
+    ?{success:'🛸 ',error:'☠ ',info:'📡 '}
+    :{success:'⚓ ',error:'⚠ ',info:'◈ '};
+  t.textContent=(icons[type]||'◈ ')+msg;
+  c.appendChild(t);
+  setTimeout(()=>{t.style.cssText+='opacity:0;transform:translateX(80px);transition:all 0.4s ease;';setTimeout(()=>t.remove(),400);},dur);
+}
+
+async function checkHealth(){
+  try{
+    const h=await get('/api/health');
+    const d=document.getElementById('beacon-dot');
+    d.className='beacon-dot live';
+    document.getElementById('status-text').textContent=isSpace()?'ONLINE: '+h.machine:h.machine||'Anchored';
+  }catch{
+    const d=document.getElementById('beacon-dot');
+    d.className='beacon-dot dead';
+    document.getElementById('status-text').textContent=isSpace()?'SIGNAL LOST':'Lost at sea';
+  }
+}
+
+async function loadDashboard(){
+  try{
+    const sources=await get('/api/sources');
+    let tf=0,td=0,tb=0;
+    sources.forEach(s=>{tf+=s.stats?.files||0;td+=s.stats?.folders||0;tb+=s.stats?.total_bytes||0;});
+    document.getElementById('ds-sources').textContent=sources.length;
+    document.getElementById('ds-files').textContent=fmtNum(tf);
+    document.getElementById('ds-folders').textContent=fmtNum(td);
+    document.getElementById('ds-size').textContent=fmtBytes(tb);
+    const sl=document.getElementById('dash-sources-list');
+    const unscanned = sources.filter(s => (s.stats?.total||0) === 0);
+    const unscannedBanner = unscanned.length > 0
+      ? `<div style="margin-bottom:12px;padding:10px 14px;background:rgba(57,255,20,0.06);border:1px solid rgba(57,255,20,0.25);border-radius:2px;display:flex;align-items:center;gap:10px;">
+           <span style="font-size:18px;">▶</span>
+           <div style="flex:1;">
+             <div style="font-family:'Cinzel',serif;font-size:10px;font-weight:700;color:var(--green-nav);letter-spacing:1px;">${unscanned.length} SOURCE${unscanned.length>1?'S':''} NOT YET SCANNED</div>
+             <div style="font-size:11px;color:var(--ink-muted);margin-top:2px;font-style:italic;">Go to Sources and click <strong style="color:var(--green-nav);">▶ SCAN</strong> on each source, or use the Expeditions panel.</div>
+           </div>
+           <button class="btn btn-success" onclick="showPanel('sources')" style="flex-shrink:0;padding:6px 12px;font-size:9px;">Go to Sources</button>
+         </div>` : '';
+    sl.innerHTML=sources.length===0
+      ?'<div class="empty-state" style="padding:20px 0;"><div style="font-size:24px;opacity:.6;">⚓</div><div style="margin-top:6px;color:var(--ink-muted);font-size:11px;font-style:italic;">No sources charted yet.</div></div>'
+      :unscannedBanner+sources.slice(0,4).map(s=>{
+        const needsScan=(s.stats?.total||0)===0;
+        return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);">
+          <span style="font-size:18px;">${s.type==='local_fs'?'💾':'☁'}</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Cinzel',serif;font-size:11px;font-weight:600;">${esc(s.display_name||s.id)}</div>
+            <div style="font-family:'Fira Mono',monospace;font-size:9px;color:var(--ink-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(s.root_path||s.cloud_root||'')}</div>
+          </div>
+          ${needsScan
+            ? `<button class="btn btn-success" onclick="quickScan('${s.id}');loadDashboard()" style="padding:4px 10px;font-size:9px;gap:4px;"><svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M3 2.5l10 5.5-10 5.5V2.5z"/></svg>SCAN</button>`
+            : `<span style="font-family:'Cinzel',serif;font-size:10px;color:var(--ink-muted);">${fmtNum(s.stats?.files||0)} files</span>`
+          }
+        </div>`;
+      }).join('');
+    const jobs=await get('/api/scan/jobs?limit=5');
+    const jl=document.getElementById('dash-jobs-list');
+    jl.innerHTML=jobs.length===0
+      ?'<div class="empty-state" style="padding:20px 0;"><div style="font-size:24px;opacity:.6;">⛵</div><div style="margin-top:6px;color:var(--ink-muted);font-size:11px;font-style:italic;">No expeditions yet.</div></div>'
+      :jobs.map(j=>{
+        const src=sources.find(s=>s.id===j.source_id);
+        const icon={done:'⚓',running:'⛵',error:'⚠',queued:'⌛',canceled:'✖'}[j.status]||'?';
+        const col={done:'var(--green-nav)',running:'var(--sea-bright)',error:'var(--red-nav)',queued:'var(--ink-muted)',canceled:'var(--ink-muted)'}[j.status];
+        return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);">
+          <span style="color:${col};font-size:18px;">${icon}</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Cinzel',serif;font-size:11px;font-weight:600;">${esc(src?.display_name||j.source_id)}</div>
+            <div style="font-size:10px;color:var(--ink-muted);font-style:italic;">${fmtNum(j.items_included||0)} indexed · ${j.status}</div>
+          </div></div>`;
+      }).join('');
+  }catch(e){toast('Chart load failed: '+e.message,'error');}
+}
+
+function onSourceTypeChange(){
+  const t=document.getElementById('src-type').value;
+  document.getElementById('local-fields').style.display=t==='local_fs'?'':'none';
+  document.getElementById('dropbox-fields').style.display=t!=='local_fs'?'':'none';
+  if(t!=='local_fs')refreshDropboxCredOptions();
+}
+async function refreshDropboxCredOptions(){
+  const creds=await get('/api/credentials').catch(()=>[]);
+  const sel=document.getElementById('src-cred');
+  sel.innerHTML='<option value="">— Select connected portal —</option>';
+  const dbxCreds=creds.filter(c=>c.provider.startsWith('dropbox'));
+  dbxCreds.forEach(c=>{sel.innerHTML+=`<option value="${c.id}">${c.provider} (${c.id.slice(0,8)}…)</option>`;});
+  // Auto-select if only one credential exists
+  if(dbxCreds.length===1){sel.value=dbxCreds[0].id;}
+  // Always sync Browse button state after populating
+  onCredChange();
+}
+async function createSource(){
+  const type=document.getElementById('src-type').value;
+  const body={type,display_name:document.getElementById('src-name').value.trim()||undefined,default_policy:document.getElementById('src-policy').value,notes:document.getElementById('src-notes').value.trim()||undefined};
+  if(type==='local_fs')body.root_path=document.getElementById('src-path').value.trim();
+  else{body.credentials_ref=document.getElementById('src-cred').value;body.cloud_root=document.getElementById('src-cloud-root').value.trim()||undefined;body.teamspace_enabled=type==='dropbox_team';}
+  try{await post('/api/sources',body);toast('Territory charted!','success');loadSources();['src-name','src-path','src-notes','src-cloud-root'].forEach(id=>document.getElementById(id).value='');}
+  catch(e){toast('Failed: '+e.message,'error');}
+}
+async function loadSources(){
+  try{
+    const sources=await get('/api/sources');
+    const el=document.getElementById('source-list');
+    if(sources.length===0){el.innerHTML='<div class="empty-state"><div class="empty-sigil">🗺</div><div class="empty-title">Terra Incognita</div><div class="empty-desc">No territories charted. Use the form above to begin.</div></div>';return;}
+    el.innerHTML=sources.map(s=>{
+      const icon=s.type==='local_fs'?'💾':'☁';
+      const tag=s.type==='local_fs'?'<span class="tag tag-local">LOCAL</span>':'<span class="tag tag-dropbox">CLOUD</span>';
+      return `<div class="source-card">
+        <div class="source-sigil">${icon}</div>
+        <div class="source-info"><div class="source-name">${esc(s.display_name||s.id)} ${tag}</div><div class="source-path">${esc(s.root_path||s.cloud_root||'—')}</div></div>
+        <div class="source-stats">
+          <div class="source-stat"><div class="source-stat-val">${fmtNum(s.stats?.files||0)}</div><div class="source-stat-lbl">Files</div></div>
+          <div class="source-stat"><div class="source-stat-val">${fmtNum(s.stats?.folders||0)}</div><div class="source-stat-lbl">Folders</div></div>
+          <div class="source-stat"><div class="source-stat-val">${s.stats?.total_bytes?fmtBytes(s.stats.total_bytes):'—'}</div><div class="source-stat-lbl">Size</div></div>
+        </div>
+        <div class="source-actions">
+          <button class="btn btn-success" onclick="quickScan('${s.id}')" title="Launch scan" style="gap:5px;">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style="flex-shrink:0;"><path d="M3 2.5l10 5.5-10 5.5V2.5z"/></svg>
+            <span style="font-size:9px;letter-spacing:1px;">SCAN</span>
+          </button>
+          <button class="btn btn-ghost" onclick="browseTo('${s.id}','/');showPanel('browse')" title="Browse indexed files" style="font-size:13px;padding:7px 11px;">⊞</button>
+          <button class="btn btn-danger" onclick="deleteSource('${s.id}')" title="Remove source" style="font-size:13px;padding:7px 11px;">✕</button>
+        </div></div>`;
+    }).join('');
+    populateSourceSelects(sources);
+  }catch(e){toast('Load failed: '+e.message,'error');}
+}
+async function deleteSource(id){if(!confirm('Remove this territory from the chart?'))return;try{await del('/api/sources/'+id);toast('Territory removed','info');loadSources();}catch(e){toast('Failed: '+e.message,'error');}}
+async function quickScan(sid){try{const j=await post(`/api/scan/run?source_id=${sid}&mode=manual`);toast('Expedition launched!','success');pollJob(j.id);}catch(e){toast('Launch failed: '+e.message,'error');}}
+function populateSourceSelects(sources){
+  ['#browse-source','#search-source','#rule-source','#scan-source','#rules-filter-source'].forEach(sel=>{
+    const el=document.querySelector(sel);if(!el)return;
+    const prev=el.value,isSrc=sel==='#search-source';
+    el.innerHTML=`<option value="">${isSrc?'All territories':'— Choose territory —'}</option>`;
+    sources.forEach(s=>el.innerHTML+=`<option value="${s.id}">${esc(s.display_name||s.id)}</option>`);
+    if(prev)el.value=prev;
+  });
+}
+
+let _bp='/',_bsid='';
+async function loadBrowseSources(){const s=await get('/api/sources').catch(()=>[]);populateSourceSelects(s);}
+function onBrowseSourceChange(){_bsid=document.getElementById('browse-source').value;_bp='/';document.getElementById('browse-path').textContent='/';if(_bsid)doBrowse();else document.getElementById('browse-tree').innerHTML='';}
+function browseTo(sid,path){_bsid=sid;_bp=path;document.getElementById('browse-source').value=sid;document.getElementById('browse-path').textContent=path||'/';doBrowse();}
+function browseUp(){if(!_bsid)return;const p=_bp.replace(/\/$/,'').split('/').filter(Boolean);p.pop();_bp=p.length?'/'+p.join('/'):'/' ;document.getElementById('browse-path').textContent=_bp;doBrowse();}
+function browseRoot(){if(!_bsid)return;_bp='/';document.getElementById('browse-path').textContent='/';doBrowse();}
+async function doBrowse(){
+  if(!_bsid)return;
+  const tree=document.getElementById('browse-tree');
+  tree.innerHTML='<div style="padding:20px;color:var(--ink-muted);display:flex;align-items:center;gap:10px;font-style:italic;"><span class="spinner"></span> Charting…</div>';
+  try{
+    const sources=await get('/api/sources');
+    const source=sources.find(s=>s.id===_bsid);
+    const isPortal=source&&source.type!=='local_fs';
+    const items=await get(isPortal?`/api/portal/browse?source_id=${_bsid}&path=${encodeURIComponent(_bp)}`:`/api/browse?source_id=${_bsid}&path=${encodeURIComponent(_bp)}`);
+    renderTree(items);
+  }catch(e){tree.innerHTML=`<div style="padding:20px;color:var(--red-nav);font-style:italic;">⚠ ${esc(e.message)}</div>`;}
+}
+function renderTree(items){
+  const tree=document.getElementById('browse-tree');
+  if(items.length===0){tree.innerHTML='<div style="padding:20px;color:var(--ink-muted);text-align:center;font-style:italic;">Empty waters — nothing charted here yet.</div>';document.getElementById('browse-count').textContent='📍 Empty Territory';return;}
+  const inc=items.filter(i=>i.effective_policy==='include').length,exc=items.filter(i=>i.effective_policy==='exclude').length;
+  document.getElementById('browse-count').textContent=`📍 ${items.length} entries`;
+  const iB=document.getElementById('browse-include-badge'),eB=document.getElementById('browse-exclude-badge');
+  iB.style.display=inc?'':'none';eB.style.display=exc?'':'none';
+  iB.textContent=inc+' charted';eB.textContent=exc+' excluded';
+  tree.innerHTML=items.map(item=>{
+    const isDir=item.type==='folder',icon=isDir?'📁':extIcon(item.name),sz=item.size?fmtBytes(item.size):'';
+    const pol=item.effective_policy==='include'?'<span class="policy-include">CHARTED</span>':'<span class="policy-exclude">EXCLUDED</span>';
+    const click=isDir?`onclick="navigateTree('${esc(item.path.replace(/'/g,"\\'"))}')"` :'';
+    return `<div class="tree-item" ${click}><span style="font-size:16px;">${icon}</span><span class="tree-item-name">${esc(item.name)}</span><span class="tree-meta">${sz}</span>${pol}</div>`;
+  }).join('');
+}
+function navigateTree(path){_bp=path;document.getElementById('browse-path').textContent=path;doBrowse();}
+
+let _st=null;
+function debounceSearch(){clearTimeout(_st);_st=setTimeout(doSearch,420);}
+async function loadSearchSources(){const s=await get('/api/sources').catch(()=>[]);populateSourceSelects(s);}
+async function doSearch(){
+  const q=document.getElementById('search-q').value.trim();if(!q)return;
+  const sid=document.getElementById('search-source').value;
+  const el=document.getElementById('search-results');
+  el.innerHTML='<div style="padding:20px;color:var(--ink-muted);display:flex;align-items:center;gap:10px;font-style:italic;"><span class="spinner"></span> Searching the atlas…</div>';
+  try{
+    const results=await get(`/api/search?q=${encodeURIComponent(q)}&limit=80`+(sid?`&source_id=${sid}`:''));
+    if(results.length===0){el.innerHTML=`<div class="empty-state"><div class="empty-sigil">🔭</div><div class="empty-title">Not Found</div><div class="empty-desc">No entries matching "${esc(q)}" in the catalog.</div></div>`;return;}
+    el.innerHTML=`<div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;color:var(--ink-muted);margin-bottom:12px;text-transform:uppercase;">${results.length} ${results.length===1?'Entry':'Entries'} Found</div>`
+      +results.map(r=>`<div class="search-result"><div class="result-icon">${r.entry_type==='folder'?'📁':extIcon(r.name)}</div><div style="flex:1;min-width:0;"><div class="result-name">${highlightMatch(r.name,q)}</div><div class="result-path">${esc(r.path)}</div><div class="result-meta">${r.source_name?`<span>⚓ ${esc(r.source_name)}</span>`:''} ${r.size?`<span>${fmtBytes(r.size)}</span>`:''} ${r.modified_at?`<span>${fmtDate(r.modified_at)}</span>`:''}</div></div></div>`).join('');
+  }catch(e){el.innerHTML=`<div style="padding:20px;color:var(--red-nav);font-style:italic;">⚠ ${esc(e.message)}</div>`;}
+}
+
+async function loadRules(){
+  const sid=document.getElementById('rules-filter-source').value;
+  const sources=await get('/api/sources').catch(()=>[]);
+  populateSourceSelects(sources);document.getElementById('rules-filter-source').value=sid;
+  if(!sid){document.getElementById('rules-list').innerHTML='<div style="color:var(--ink-muted);font-size:12px;text-align:center;padding:24px;font-style:italic;">Select a territory to view its decrees.</div>';return;}
+  try{
+    const rules=await get('/api/rules?source_id='+sid);
+    const el=document.getElementById('rules-list');
+    if(rules.length===0){el.innerHTML='<div style="color:var(--ink-muted);font-size:12px;text-align:center;padding:24px;font-style:italic;">No decrees issued. The default policy governs all.</div>';return;}
+    el.innerHTML=rules.map(r=>`<div class="rule-row"><span class="rule-prefix">${esc(r.path_prefix||'/')}</span><span class="${r.policy==='include'?'policy-include':'policy-exclude'}">${r.policy.toUpperCase()}</span><button class="btn btn-danger" onclick="deleteRule('${r.id}')" style="padding:3px 8px;font-size:10px;">✕</button></div>`).join('');
+  }catch(e){toast('Load failed: '+e.message,'error');}
+}
+async function createRule(){
+  const src=document.getElementById('rule-source').value,pfx=document.getElementById('rule-prefix').value.trim(),pol=document.getElementById('rule-policy').value;
+  if(!src||!pfx){toast('Choose a territory and enter a path prefix','error');return;}
+  try{await post('/api/rules',{source_id:src,path_prefix:pfx,policy:pol});toast('Decree issued','success');document.getElementById('rule-prefix').value='';document.getElementById('rules-filter-source').value=src;loadRules();}
+  catch(e){toast('Failed: '+e.message,'error');}
+}
+async function deleteRule(id){try{await del('/api/rules/'+id);toast('Decree revoked','info');loadRules();}catch(e){toast('Failed: '+e.message,'error');}}
+
+async function loadJobs(){
+  const sources=await get('/api/sources').catch(()=>[]);populateSourceSelects(sources);
+  try{
+    const jobs=await get('/api/scan/jobs?limit=30');
+    const el=document.getElementById('jobs-list');
+    if(jobs.length===0){el.innerHTML='<div class="empty-state"><div class="empty-sigil">⛵</div><div class="empty-title">No Expeditions Yet</div><div class="empty-desc">Launch your first expedition above.</div></div>';return;}
+    el.innerHTML=jobs.map(j=>{
+      const src=sources.find(s=>s.id===j.source_id);
+      const sm={done:{icon:'⚓',col:'var(--green-nav)',b:'badge-green'},running:{icon:'⛵',col:'var(--sea-bright)',b:'badge-sea'},error:{icon:'⚠',col:'var(--red-nav)',b:'badge-red'},queued:{icon:'⌛',col:'var(--ink-muted)',b:'badge-muted'},canceled:{icon:'✖',col:'var(--ink-muted)',b:'badge-muted'}}[j.status]||{icon:'?',col:'var(--ink-muted)',b:'badge-muted'};
+      const elapsed=j.started_at&&j.completed_at?Math.round((new Date(j.completed_at)-new Date(j.started_at))/1000)+'s':'';
+      const pct=j.status==='running'&&j.items_scanned>0?Math.min(95,Math.round((j.items_included/(j.items_scanned+1))*100)):j.status==='done'?100:0;
+      return `<div class="job-row"><div class="job-sigil" style="color:${sm.col}">${sm.icon}</div><div class="job-info">
+        <div class="job-title">${esc(src?.display_name||j.source_id)}<span class="badge ${sm.b}">${j.status}</span><span class="badge badge-muted">${j.mode}</span></div>
+        <div class="job-subtitle">${fmtNum(j.items_included)} charted · ${fmtNum(j.items_excluded)} excluded · ${fmtNum(j.items_scanned)} surveyed${elapsed?' · '+elapsed:''}${j.error_message?' · ⚠ '+esc(j.error_message):''}</div>
+        ${j.status==='running'?`<div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>`:''}
+      </div><div style="font-size:10px;color:var(--ink-muted);flex-shrink:0;font-style:italic;">${j.created_at?fmtDate(j.created_at):''}</div>
+      ${j.status==='running'?`<button class="btn btn-danger" onclick="cancelJob('${j.id}')" style="flex-shrink:0;padding:4px 8px;font-size:10px;">Abort</button>`:''}</div>`;
+    }).join('');
+  }catch(e){toast('Load failed: '+e.message,'error');}
+}
+async function runScan(){
+  const sid=document.getElementById('scan-source').value,mode=document.getElementById('scan-mode').value;
+  if(!sid){toast('Choose a destination first','error');return;}
+  try{const j=await post(`/api/scan/run?source_id=${sid}&mode=${mode}`);toast('Expedition underway!','success');pollJob(j.id);setTimeout(loadJobs,500);}
+  catch(e){toast('Launch failed: '+e.message,'error');}
+}
+async function cancelJob(id){try{await post('/api/scan/cancel/'+id);toast('Expedition recalled','info');setTimeout(loadJobs,500);}catch(e){toast('Failed: '+e.message,'error');}}
+function pollJob(jid){
+  const iv=setInterval(async()=>{
+    try{
+      const j=await get('/api/scan/status/'+jid);
+      if(['done','error','canceled'].includes(j.status)){
+        clearInterval(iv);
+        toast(j.status==='done'?`Expedition returned — ${fmtNum(j.items_included)} entries charted`:`Expedition ${j.status}${j.error_message?': '+j.error_message:''}`,j.status==='done'?'success':'error');
+        const a=document.querySelector('.panel.active')?.id;
+        if(a==='panel-jobs')loadJobs();if(a==='panel-dashboard')loadDashboard();if(a==='panel-sources')loadSources();
+      }
+    }catch{clearInterval(iv);}
+  },2000);
+}
+
+async function loadPortals(){
+  try{
+    const data=await get('/api/auth/dropbox/status');const el=document.getElementById('portals-list');
+    if(!data.connected||data.connected.length===0){el.innerHTML='<div class="empty-state"><div class="empty-sigil">☁</div><div class="empty-title">No Portals Anchored</div><div class="empty-desc">Open a Dropbox connection above.</div></div>';return;}
+    el.innerHTML=data.connected.map(c=>`<div class="portal-card"><span style="font-size:24px;">☁</span><div style="flex:1;"><div style="font-family:'Cinzel',serif;font-size:12px;font-weight:600;">${esc(c.provider)}</div><div style="font-family:'Fira Mono',monospace;font-size:10px;color:var(--ink-muted);">id: ${c.id}</div></div><span class="badge badge-green">Anchored</span></div>`).join('');
+  }catch(e){toast('Load portals failed: '+e.message,'error');}
+}
+async function startDropboxAuth(t){
+  try{const d=await get(`/api/auth/dropbox/start?account_type=${t}`);window.open(d.auth_url,'dropbox_auth','width=820,height=620');window.addEventListener('message',function h(e){if(e.data?.type==='dropbox_auth_complete'){window.removeEventListener('message',h);toast('Portal anchored! — '+e.data.cred_id.slice(0,8),'success');loadPortals();}});}
+  catch(e){toast('Portal failed: '+e.message,'error');}
+}
+
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtNum(n){if(!n)return'0';return Number(n).toLocaleString();}
+function fmtBytes(b){if(!b)return'—';const u=['B','KB','MB','GB','TB'];let i=0;while(b>=1024&&i<4){b/=1024;i++;}return b.toFixed(i>0?1:0)+'\u202f'+u[i];}
+function fmtDate(iso){if(!iso)return'';try{return new Date(iso).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});}catch{return iso;}}
+function extIcon(n){const e=(n||'').split('.').pop().toLowerCase();return{pdf:'📜',doc:'📝',docx:'📝',xls:'📊',xlsx:'📊',ppt:'📑',pptx:'📑',jpg:'🖼',jpeg:'🖼',png:'🖼',gif:'🖼',mp4:'🎬',mov:'🎬',mp3:'🎵',zip:'📦',tar:'📦',gz:'📦',py:'🐍',js:'📜',ts:'📜',sh:'⚙',txt:'📄',md:'📄',csv:'📊',json:'📋',xml:'📋'}[e]||'📄';}
+function highlightMatch(text,q){const e=esc(text),qe=esc(q).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');return e.replace(new RegExp(`(${qe})`,'gi'),'<mark style="background:var(--gold-glow);color:var(--gold);border-radius:1px;padding:0 2px;">$1</mark>');}
+
+applyNavLabels();checkHealth();setInterval(checkHealth,15000);loadDashboard();
+
+/* ── Folder picker modal (calls /api/fs/browse on the local server) ── */
+
+let _fmParent = null;
+let _fmSelected = null;
+
+async function openFolderModal() {
+  const modal = document.getElementById('folder-modal');
+  modal.style.display = 'flex';
+  _fmSelected = null;
+  document.getElementById('fm-select-btn').disabled = true;
+  document.getElementById('fm-selected-label').textContent = 'No folder selected';
+  // Start at current input value, or home
+  const startPath = document.getElementById('src-path').value.trim() || '~';
+  await fsModalNav(startPath);
+}
+
+function closeFolderModal() {
+  document.getElementById('folder-modal').style.display = 'none';
+}
+
+function confirmFolderModal() {
+  if (!_fmSelected) return;
+  const nameparts = _fmSelected.split('/');
+  const folderName = nameparts[nameparts.length - 1] || _fmSelected;
+  setFolderPath(_fmSelected, folderName, 'browsed');
+  closeFolderModal();
+}
+
+async function fsModalNav(path) {
+  const list = document.getElementById('fm-list');
+  list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink-muted);"><span class="spinner"></span></div>';
+  try {
+    const data = await get('/api/fs/browse?path=' + encodeURIComponent(path || '~'));
+    _fmParent = data.parent;
+    document.getElementById('fm-current-path').textContent = data.current;
+    document.getElementById('fm-path-input').value = data.current;
+    document.getElementById('fm-up-btn').disabled = !data.parent;
+
+    // Mark current dir as selectable
+    _fmSelected = data.current;
+    document.getElementById('fm-select-btn').disabled = false;
+    document.getElementById('fm-selected-label').textContent = data.current;
+
+    if (data.dirs.length === 0) {
+      list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink-muted);font-style:italic;">No subdirectories here</div>';
+      return;
+    }
+
+    list.innerHTML = data.dirs.map(d => `
+      <div onclick="fsModalSelect('${d.path.replace(/'/g, "\\'")}')"
+           ondblclick="fsModalNav('${d.path.replace(/'/g, "\\'")}')"
+           id="fm-item-${btoa(d.path).replace(/[^a-z0-9]/gi,'')}"
+           style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:2px;
+                  cursor:pointer;border:1px solid transparent;margin-bottom:2px;transition:all 0.12s;"
+           onmouseenter="this.style.background='var(--parchment)'"
+           onmouseleave="this.style.background=''">
+        <span style="font-size:16px;">📁</span>
+        <span style="flex:1;font-family:'Lora',serif;font-size:13px;color:var(--ink);">${esc(d.name)}</span>
+        <span onclick="event.stopPropagation();fsModalNav('${d.path.replace(/'/g, "\\'")}')"
+              style="font-size:10px;color:var(--ink-muted);padding:2px 6px;border:1px solid var(--border);
+                     border-radius:1px;cursor:pointer;font-family:'Cinzel',serif;letter-spacing:1px;">
+          OPEN →
+        </span>
+      </div>`).join('');
+  } catch(e) {
+    list.innerHTML = `<div style="padding:20px;color:var(--red-nav);font-style:italic;">⚠ ${esc(e.message)}</div>`;
+  }
+}
+
+function fsModalSelect(path) {
+  _fmSelected = path;
+  document.getElementById('fm-select-btn').disabled = false;
+  document.getElementById('fm-selected-label').textContent = path;
+  // Highlight selected
+  document.querySelectorAll('#fm-list > div').forEach(el => {
+    el.style.background = '';
+    el.style.borderColor = 'transparent';
+  });
+  // Find and highlight
+  const key = btoa(path).replace(/[^a-z0-9]/gi,'');
+  const el = document.getElementById('fm-item-' + key);
+  if (el) { el.style.background = 'var(--gold-glow)'; el.style.borderColor = 'var(--gold)'; }
+}
+
+function fsModalUp() {
+  if (_fmParent) fsModalNav(_fmParent);
+}
+
+// Close local modal on backdrop click
+document.getElementById('folder-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeFolderModal();
+});
+
+/* ── Dropbox folder picker modal ── */
+
+let _dbxmParent = null;
+let _dbxmSelected = null;
+let _dbxmCredId = null;
+
+function onCredChange() {
+  const credId = document.getElementById('src-cred').value;
+  const btn = document.getElementById('dbx-browse-btn');
+  if (btn) btn.disabled = !credId;
+  _dbxmCredId = credId || null;
+}
+
+function openDropboxModal() {
+  _dbxmCredId = document.getElementById('src-cred').value;
+  if (!_dbxmCredId) { toast('Select a connected portal first', 'error'); return; }
+
+  const modal = document.getElementById('dbx-modal');
+  modal.style.display = 'flex';
+  _dbxmSelected = null;
+  document.getElementById('dbxm-select-btn').disabled = true;
+  document.getElementById('dbxm-selected-label').textContent = 'Select a folder — or leave at root for full Dropbox';
+
+  // Start at current cloud root value or Dropbox root
+  const startPath = document.getElementById('src-cloud-root').value.trim() || '';
+  dbxModalNav(startPath);
+}
+
+function closeDropboxModal() {
+  document.getElementById('dbx-modal').style.display = 'none';
+}
+
+function confirmDropboxModal(forcePath) {
+  const path = (forcePath !== undefined) ? forcePath : _dbxmSelected;
+  if (path === null) return;
+  document.getElementById('src-cloud-root').value = path;
+  // Auto-fill source name if empty
+  if (!document.getElementById('src-name').value && path) {
+    const parts = path.split('/').filter(Boolean);
+    if (parts.length) document.getElementById('src-name').value = parts[parts.length - 1];
+  }
+  closeDropboxModal();
+  toast(path ? 'Cloud root set to ' + path : 'Set to full Dropbox', 'success');
+}
+
+async function dbxModalNav(path) {
+  if (!_dbxmCredId) return;
+  const list = document.getElementById('dbxm-list');
+  list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink-muted);"><span class="spinner"></span></div>';
+
+  try {
+    const norm = (path || '').trim();
+    const data = await get('/api/dropbox/browse?cred_id=' + encodeURIComponent(_dbxmCredId) + '&path=' + encodeURIComponent(norm));
+    _dbxmParent = data.parent;
+
+    const displayPath = data.current === '/' ? '/ (Dropbox root)' : data.current;
+    document.getElementById('dbxm-current-path').textContent = displayPath;
+    document.getElementById('dbxm-path-input').value = data.current === '/' ? '' : data.current;
+    document.getElementById('dbxm-up-btn').disabled = data.parent === null;
+
+    if (data.dirs.length === 0) {
+      list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink-muted);font-style:italic;">No subfolders here</div>';
+      return;
+    }
+
+    list.innerHTML = data.dirs.map(d => {
+      const safePath = d.path.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      const key = btoa(unescape(encodeURIComponent(d.path))).replace(/[^a-z0-9]/gi,'');
+      return `
+        <div onclick="dbxModalSelect('${safePath}','${esc(d.name)}')"
+             ondblclick="dbxModalNav('${safePath}')"
+             id="dbxm-item-${key}"
+             style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:2px;
+                    cursor:pointer;border:1px solid transparent;margin-bottom:2px;transition:all 0.12s;"
+             onmouseenter="this.style.background='var(--parchment)'"
+             onmouseleave="this.style.background=''"
+        >
+          <span style="font-size:18px;">☁️</span>
+          <span style="flex:1;font-family:'Lora',serif;font-size:13px;color:var(--ink);">${esc(d.name)}</span>
+          <span onclick="event.stopPropagation();dbxModalNav('${safePath}')"
+                style="font-size:10px;color:var(--ink-muted);padding:2px 6px;border:1px solid var(--border);
+                       border-radius:1px;cursor:pointer;font-family:'Cinzel',serif;letter-spacing:1px;">
+            OPEN &rarr;
+          </span>
+        </div>`;
+    }).join('');
+
+  } catch(e) {
+    list.innerHTML = `<div style="padding:20px;color:var(--red-nav);font-style:italic;">&#9888; ${esc(e.message)}</div>`;
+  }
+}
+
+function dbxModalSelect(path, name) {
+  _dbxmSelected = path;
+  document.getElementById('dbxm-select-btn').disabled = false;
+  document.getElementById('dbxm-selected-label').textContent = path;
+
+  // Highlight selected row
+  document.querySelectorAll('#dbxm-list > div').forEach(el => {
+    el.style.background = ''; el.style.borderColor = 'transparent';
+  });
+  const key = btoa(unescape(encodeURIComponent(path))).replace(/[^a-z0-9]/gi,'');
+  const el = document.getElementById('dbxm-item-' + key);
+  if (el) { el.style.background = 'var(--gold-glow)'; el.style.borderColor = 'var(--gold)'; }
+}
+
+function dbxModalUp() {
+  if (_dbxmParent !== null) dbxModalNav(_dbxmParent);
+}
+
+// Close Dropbox modal on backdrop click
+document.getElementById('dbx-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeDropboxModal();
+});
+
+function onDragOver(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  // Check if it contains folders / files
+  const hasItems = e.dataTransfer.items && e.dataTransfer.items.length > 0;
+  if (hasItems) {
+    e.dataTransfer.dropEffect = 'copy';
+    const dz = document.getElementById('drop-zone');
+    dz.classList.add('drag-over');
+  }
+}
+
+function onDragLeave(e) {
+  e.preventDefault();
+  const dz = document.getElementById('drop-zone');
+  // Only remove if leaving the zone entirely (not entering a child)
+  if (!dz.contains(e.relatedTarget)) {
+    dz.classList.remove('drag-over');
+  }
+}
+
+async function onFolderDrop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const dz = document.getElementById('drop-zone');
+  dz.classList.remove('drag-over');
+
+  const items = e.dataTransfer.items;
+  if (!items || items.length === 0) return;
+
+  let folderName = '';
+  let absPath = '';
+  let resolved = '';
+
+  // Prefer FileSystemEntry (gives folder name reliably)
+  for (const item of items) {
+    if (item.kind !== 'file') continue;
+
+    // Try webkitGetAsEntry first — most reliable for folder detection
+    const entry = item.webkitGetAsEntry ? item.webkitGetAsEntry() : null;
+    if (entry) {
+      folderName = entry.name;
+      // entry.fullPath is virtual ("/FolderName"), not the OS path
+
+      // Try getting real path from the File object
+      const file = item.getAsFile();
+      if (file) {
+        absPath = file.path || ''; // real path in Electron
+        if (absPath) {
+          // Absolute path of the dragged folder itself (Electron gives directory path directly)
+          resolved = absPath;
+        }
+      }
+
+      if (entry.isDirectory) break; // prefer directory entries
+    } else {
+      // Fallback: plain File
+      const file = item.getAsFile();
+      if (file) {
+        folderName = file.name;
+        absPath = file.path || '';
+        resolved = absPath;
+      }
+    }
+  }
+
+  // Also check dataTransfer.files as fallback
+  if (!folderName && e.dataTransfer.files.length > 0) {
+    const f = e.dataTransfer.files[0];
+    folderName = f.name;
+    absPath = f.path || '';
+    resolved = absPath;
+  }
+
+  if (!folderName) {
+    toast('Could not read the dropped item', 'error');
+    return;
+  }
+
+  setFolderPath(resolved || absPath, folderName, resolved ? 'dropped' : 'name-only');
+}
+
+function setFolderPath(fullPath, folderName, mode) {
+  const pathInput = document.getElementById('src-path');
+  const hint = document.getElementById('path-hint');
+  const dz = document.getElementById('drop-zone');
+  const dzIcon = document.getElementById('drop-zone-icon');
+  const dzLabel = document.getElementById('drop-zone-label');
+  const dzSub = document.getElementById('drop-zone-sub');
+
+  dz.classList.add('drop-success');
+  setTimeout(() => dz.classList.remove('drop-success'), 2000);
+
+  if (fullPath) {
+    pathInput.value = fullPath;
+    dzIcon.textContent = '✓';
+    dzLabel.textContent = folderName;
+    dzSub.textContent = fullPath;
+    hint.style.display = 'none';
+  } else {
+    // Browser security — show name + ask user to confirm path
+    dzIcon.textContent = '📁';
+    dzLabel.textContent = folderName;
+    dzSub.textContent = 'Verify the full path below';
+
+    hint.style.display = '';
+        const spaceMsg = '<span class="hint-warn">⚠ BROWSER SECURITY:</span> Full path inaccessible via web API.<br>Folder detected: <strong style="color:var(--ink)">' + folderName + '</strong><br>Enter the full path above, e.g.:<br><span class="hint-ok">/Users/you/Documents/' + folderName + '</span>';
+    const chartMsg = '<span class="hint-warn">⚠ Path confirmation needed</span><br>Folder name: <strong>' + folderName + '</strong><br>Edit the full path above, e.g.: <span class="hint-ok">/Users/you/Documents/' + folderName + '</span>';
+    hint.innerHTML = isSpace() ? spaceMsg : chartMsg;
+
+    // Pre-fill with best guess (just the folder name as a hint)
+    if (!pathInput.value) {
+      pathInput.placeholder = '/your/path/to/' + folderName;
+    }
+  }
+
+  // Auto-fill display name if empty
+  const nameInput = document.getElementById('src-name');
+  if (!nameInput.value) nameInput.value = folderName;
+
+  // Also reset icon after 3s if we only got the name
+  if (!fullPath) {
+    setTimeout(() => {
+      dzIcon.textContent = '📁';
+      dzLabel.textContent = 'Drop a folder here';
+      dzSub.textContent = 'from Finder or File Explorer';
+    }, 5000);
+  }
+}
+
+</script>
+</body>
+</html>

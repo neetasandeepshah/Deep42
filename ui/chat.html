@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Deep42 — Ask</title>
+<!-- No external font requests — 100% system fonts, instant load -->
+<style>
+  /* SF Pro on Apple devices, Segoe on Windows, clean fallbacks elsewhere */
+  @font-face {
+    font-family: 'Deep42Mono';
+    src: local('SF Mono'), local('SFMono-Regular'), local('JetBrains Mono'),
+         local('Fira Mono'), local('Consolas'), local('monospace');
+  }
+</style>
+<style>
+:root {
+  --bg:        #000508;
+  --surface:   #04111c;
+  --surface-2: #061825;
+  --border:    rgba(0,220,140,0.15);
+  --border-hi: rgba(57,255,20,0.35);
+  --green:     #39ff14;
+  --green-lo:  rgba(57,255,20,0.10);
+  --green-mid: rgba(57,255,20,0.18);
+  --cyan:      #00cfff;
+  --cyan-lo:   rgba(0,207,255,0.08);
+  --red:       #ff3060;
+  --ink:       #c8ffe0;
+  --ink-dim:   #8ab89e;
+  --muted:     #3d8a60;
+  --radius:    16px;
+  /* System font stack — zero network requests, instant render */
+  /* Apple: SF Pro Display/Text | Windows: Segoe UI | Android: Roboto */
+  --font-ui:   -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  /* PIN numbers: SF Pro Rounded on Apple — beautiful circular numerals */
+  --font-num:  ui-rounded, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  /* Mono: SF Mono on Apple, Consolas on Windows */
+  --font-mono: 'Deep42Mono', ui-monospace, 'SF Mono', 'Menlo', 'Consolas', monospace;
+  --font-logo: ui-monospace, 'SF Mono', 'Menlo', 'Courier New', monospace; /* PIN logo */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── PIN Screen ─────────────────────────────────────────────────────── */
+#pin-screen {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 1000; gap: 24px; padding: 40px 24px;
+}
+
+.pin-logo {
+  font-family: var(--font-logo);
+  font-size: 38px;
+  font-weight: 300;
+  color: var(--green);
+  text-shadow: 0 0 30px var(--green), 0 0 60px rgba(57,255,20,0.25);
+  letter-spacing: 10px;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.pin-sub {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+  color: var(--ink-dim);
+}
+
+.pin-dots { display: flex; gap: 14px; }
+.pin-dot  {
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(61,138,96,0.5);
+  transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1);
+}
+.pin-dot.filled {
+  background: var(--green);
+  border-color: var(--green);
+  box-shadow: 0 0 10px var(--green), 0 0 20px rgba(57,255,20,0.3);
+  transform: scale(1.1);
+}
+.pin-dot.error {
+  background: var(--red);
+  border-color: var(--red);
+  box-shadow: 0 0 10px var(--red);
+  transform: scale(1.1);
+}
+
+.pin-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 11px;
+  width: min(288px, 88vw);
+  margin-top: 4px;
+}
+
+.pin-btn {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(0,220,140,0.15);
+  background: linear-gradient(160deg, #071b2a 0%, #040f1a 100%);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+  color: var(--ink);
+  /* Space Grotesk: geometric, round, pristine numerals at large sizes */
+  font-family: var(--font-num);
+  font-weight: 500;
+  font-size: 28px;
+  letter-spacing: -0.5px; /* tighten slightly for numerals */
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s ease, border-color 0.1s ease, transform 0.1s ease, box-shadow 0.1s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.pin-btn:hover {
+  border-color: rgba(57,255,20,0.3);
+  background: linear-gradient(145deg, #081f30 0%, #061825 100%);
+}
+
+.pin-btn:active {
+  background: linear-gradient(145deg, rgba(57,255,20,0.12) 0%, rgba(57,255,20,0.06) 100%);
+  border-color: var(--green);
+  box-shadow: 0 0 16px rgba(57,255,20,0.2), inset 0 1px 0 rgba(57,255,20,0.1);
+  transform: scale(0.92);
+}
+
+.pin-btn.del {
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--ink-dim);
+  letter-spacing: 0;
+}
+
+.pin-btn.del:active { color: var(--ink); }
+.pin-btn.empty { visibility: hidden; }
+
+.pin-error {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--red);
+  min-height: 18px;
+  text-align: center;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────── */
+.header {
+  padding: 12px 18px 11px;
+  padding-top: max(12px, env(safe-area-inset-top));
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+/* Space Grotesk for header — modern, readable, slightly geometric */
+.header-logo {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--green);
+  letter-spacing: 1px;       /* tight enough to feel intentional, not rigid */
+  text-shadow: 0 0 16px rgba(57,255,20,0.35);
+}
+
+.header-sub {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 11px;
+  color: var(--muted);
+  flex: 1;
+  letter-spacing: 0.2px;
+}
+
+.header-status {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+}
+.header-status.live {
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 4px var(--green); }
+  50%      { box-shadow: 0 0 14px var(--green), 0 0 24px rgba(57,255,20,0.25); }
+}
+
+/* ── Messages ────────────────────────────────────────────────────────── */
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overscroll-behavior: contain;
+}
+.messages::-webkit-scrollbar { width: 3px; }
+.messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Welcome screen */
+.welcome {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 12px;
+  padding: 36px 20px; text-align: center;
+}
+.welcome-icon {
+  font-size: 44px;
+  filter: drop-shadow(0 0 18px rgba(57,255,20,0.35));
+  margin-bottom: 2px;
+}
+.welcome-title {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 17px;
+  color: var(--green);
+  letter-spacing: 0.3px;
+}
+.welcome-desc {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 13px;
+  color: var(--ink-dim);
+  line-height: 1.65;
+  max-width: 300px;
+}
+
+/* Quick-action chips */
+.chips {
+  display: flex; flex-wrap: wrap;
+  gap: 8px; justify-content: center;
+  margin-top: 6px;
+}
+.chip {
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--cyan);
+  cursor: pointer;
+  background: var(--cyan-lo);
+  transition: all 0.15s;
+  white-space: nowrap;
+  letter-spacing: 0.1px;
+}
+.chip:hover  { background: rgba(0,207,255,0.12); border-color: rgba(0,207,255,0.4); }
+.chip:active { background: rgba(0,207,255,0.18); border-color: var(--cyan); }
+
+/* Message bubbles */
+.msg { display: flex; flex-direction: column; gap: 4px; max-width: 92%; }
+.msg.user      { align-self: flex-end;   align-items: flex-end; }
+.msg.assistant { align-self: flex-start; align-items: flex-start; }
+
+.bubble {
+  padding: 11px 15px;
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.62;
+  font-size: 14px;
+  word-break: break-word;
+  letter-spacing: 0.1px;
+}
+.msg.user .bubble {
+  background: var(--green-lo);
+  border: 1px solid rgba(57,255,20,0.22);
+  border-bottom-right-radius: 4px;
+}
+.msg.assistant .bubble {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+
+.bubble strong { color: var(--green); font-weight: 600; }
+.bubble em     { color: var(--cyan); font-style: italic; }
+.bubble code {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  background: rgba(0,207,255,0.08);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--cyan);
+}
+
+/* Tool use indicator */
+.tool-indicator {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 13px;
+  background: rgba(0,207,255,0.05);
+  border: 1px solid rgba(0,207,255,0.18);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.1px;
+  color: rgba(0,207,255,0.75);
+  margin-bottom: 4px;
+  font-style: italic;
+}
+.tool-spinner {
+  width: 11px; height: 11px;
+  border: 1.5px solid rgba(0,207,255,0.25);
+  border-top-color: var(--cyan);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Typing indicator */
+.typing { display: flex; align-items: center; gap: 5px; padding: 12px 16px; }
+.typing span {
+  width: 7px; height: 7px;
+  background: var(--green);
+  border-radius: 50%;
+  opacity: 0.4;
+  animation: blink 1.4s infinite;
+}
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes blink {
+  0%,80%,100% { opacity: 0.4; transform: scale(1); }
+  40%          { opacity: 1;   transform: scale(1.2); }
+}
+
+/* ── Input area ──────────────────────────────────────────────────────── */
+.input-area {
+  padding: 11px 14px;
+  padding-bottom: max(14px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  display: flex; gap: 10px; align-items: flex-end;
+  flex-shrink: 0;
+}
+.input-wrap {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 10px 16px;
+  min-height: 44px; max-height: 120px;
+  overflow-y: auto;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s;
+  line-height: 1.5;
+  letter-spacing: 0.1px;
+}
+.input-wrap:focus { border-color: rgba(57,255,20,0.35); }
+.input-wrap:empty::before {
+  content: attr(data-placeholder);
+  color: var(--muted);
+  font-style: italic;
+  font-weight: 300;
+  pointer-events: none;
+}
+.send-btn {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(57,255,20,0.3);
+  background: var(--green-lo);
+  color: var(--green);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.send-btn:hover   { background: var(--green-mid); box-shadow: 0 0 14px rgba(57,255,20,0.18); }
+.send-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+.send-btn svg {
+  width: 19px; height: 19px;
+  fill: none; stroke: currentColor;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+
+/* ── Subtle scanline ─────────────────────────────────────────────────── */
+body::after {
+  content: '';
+  position: fixed; left: 0; right: 0; top: 0;
+  height: 2px;
+  background: linear-gradient(transparent, rgba(57,255,20,0.035), transparent);
+  animation: scanline 9s linear infinite;
+  pointer-events: none;
+  z-index: 9999;
+}
+@keyframes scanline {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+</style>
+</head>
+<body>
+
+<!-- PIN SCREEN -->
+<div id="pin-screen">
+  <div class="pin-logo">DEEP42</div>
+  <div class="pin-sub">Enter your access PIN</div>
+  <div class="pin-dots" id="pin-dots">
+    <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+    <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+  </div>
+  <div class="pin-error" id="pin-error"></div>
+  <div class="pin-pad">
+    <button class="pin-btn" onclick="pinDigit('1')">1</button>
+    <button class="pin-btn" onclick="pinDigit('2')">2</button>
+    <button class="pin-btn" onclick="pinDigit('3')">3</button>
+    <button class="pin-btn" onclick="pinDigit('4')">4</button>
+    <button class="pin-btn" onclick="pinDigit('5')">5</button>
+    <button class="pin-btn" onclick="pinDigit('6')">6</button>
+    <button class="pin-btn" onclick="pinDigit('7')">7</button>
+    <button class="pin-btn" onclick="pinDigit('8')">8</button>
+    <button class="pin-btn" onclick="pinDigit('9')">9</button>
+    <button class="pin-btn empty"></button>
+    <button class="pin-btn" onclick="pinDigit('0')">0</button>
+    <button class="pin-btn del" onclick="pinDelete()">&#9003;</button>
+  </div>
+</div>
+
+<!-- CHAT UI -->
+<div id="chat-ui" style="display:none;flex-direction:column;height:100dvh;">
+  <div class="header">
+    <div class="header-logo">Deep42</div>
+    <div class="header-sub">Your personal archivist</div>
+    <div class="header-status" id="status-dot"></div>
+  </div>
+  <div class="messages" id="messages">
+    <div class="welcome" id="welcome">
+      <div class="welcome-icon">&#128760;</div>
+      <div class="welcome-title">The answer is in your files</div>
+      <div class="welcome-desc">Ask me anything about your indexed files and folders. I have access to your entire catalog.</div>
+      <div class="chips">
+        <div class="chip" onclick="sendChip(this)">What do you have indexed?</div>
+        <div class="chip" onclick="sendChip(this)">Find my biggest files</div>
+        <div class="chip" onclick="sendChip(this)">What did I work on recently?</div>
+        <div class="chip" onclick="sendChip(this)">Find all PDFs</div>
+        <div class="chip" onclick="sendChip(this)">Search for contracts</div>
+        <div class="chip" onclick="sendChip(this)">How much storage is indexed?</div>
+      </div>
+    </div>
+  </div>
+  <div class="input-area">
+    <div class="input-wrap" id="input" contenteditable="true"
+      data-placeholder="Ask about your files&#8230;"
+      onkeydown="handleKey(event)" oninput="handleInput()"></div>
+    <button class="send-btn" id="send-btn" onclick="sendMessage()" disabled>
+      <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+const PIN_LENGTH = 6;
+let pinBuffer = '';
+let chatToken = '';
+
+const saved = sessionStorage.getItem('d42_token');
+if (saved) { chatToken = saved; showChat(); }
+
+function pinDigit(d) {
+  if (pinBuffer.length >= PIN_LENGTH) return;
+  pinBuffer += d;
+  updatePinDots();
+  if (pinBuffer.length === PIN_LENGTH) verifyPin();
+}
+function pinDelete() {
+  pinBuffer = pinBuffer.slice(0,-1);
+  updatePinDots();
+  document.getElementById('pin-error').textContent = '';
+  document.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('error'));
+}
+function updatePinDots() {
+  document.querySelectorAll('.pin-dot').forEach((d,i) => d.classList.toggle('filled', i < pinBuffer.length));
+}
+async function verifyPin() {
+  try {
+    const res = await fetch('/api/chat/health', { headers: { 'Authorization': 'Bearer ' + pinBuffer } });
+    if (res.ok) { chatToken = pinBuffer; sessionStorage.setItem('d42_token', chatToken); showChat(); }
+    else pinError();
+  } catch { pinError(); }
+}
+function pinError() {
+  document.querySelectorAll('.pin-dot').forEach(d => { d.classList.remove('filled'); d.classList.add('error'); });
+  document.getElementById('pin-error').textContent = 'Incorrect PIN — try again';
+  setTimeout(() => {
+    document.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('error'));
+    document.getElementById('pin-error').textContent = '';
+    pinBuffer = '';
+  }, 1400);
+}
+function showChat() {
+  document.getElementById('pin-screen').style.display = 'none';
+  const ui = document.getElementById('chat-ui');
+  ui.style.display = 'flex';
+  checkHealth();
+}
+
+async function checkHealth() {
+  try {
+    const res = await fetch('/api/chat/health', { headers: { 'Authorization': 'Bearer ' + chatToken } });
+    if (res.ok) document.getElementById('status-dot').classList.add('live');
+    else if (res.status === 401 || res.status === 403) { sessionStorage.removeItem('d42_token'); location.reload(); }
+  } catch {}
+}
+
+const history = [];
+
+function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+function handleInput() { document.getElementById('send-btn').disabled = !getInputText(); }
+function getInputText() { return document.getElementById('input').innerText.trim(); }
+function clearInput() { document.getElementById('input').innerText = ''; document.getElementById('send-btn').disabled = true; }
+function sendChip(chip) { document.getElementById('input').innerText = chip.textContent; sendMessage(); }
+
+let isStreaming = false;
+
+async function sendMessage() {
+  const text = getInputText();
+  if (!text || isStreaming) return;
+
+  const welcome = document.getElementById('welcome');
+  if (welcome) welcome.remove();
+
+  clearInput();
+  appendMsg('user', text);
+  history.push({ role: 'user', content: text });
+
+  const typingId = showTyping();
+  isStreaming = true;
+  document.getElementById('send-btn').disabled = true;
+
+  const { msgEl, bubbleEl } = createAsstBubble();
+  let assistantText = '';
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + chatToken },
+      body: JSON.stringify({ messages: history }),
+    });
+
+    if (res.status === 401 || res.status === 403) { sessionStorage.removeItem('d42_token'); location.reload(); return; }
+    if (res.status === 429) {
+      removeTyping(typingId);
+      bubbleEl.innerHTML = '<em style="color:var(--red)">Rate limit reached. Try again shortly.</em>';
+      document.getElementById('messages').appendChild(msgEl);
+      return;
+    }
+
+    removeTyping(typingId);
+    document.getElementById('messages').appendChild(msgEl);
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop();
+      let evt = null;
+      for (const line of lines) {
+        if (line.startsWith('event: ')) evt = line.slice(7).trim();
+        else if (line.startsWith('data: ') && evt) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (evt === 'text') {
+              const sp = document.createElement('span');
+              sp.innerHTML = fmt(data.text || '');
+              bubbleEl.appendChild(sp);
+              assistantText += data.text || '';
+              scrollBottom();
+            } else if (evt === 'tool_call') {
+              const ti = mkToolIndicator(data.name);
+              msgEl.insertBefore(ti, bubbleEl);
+              if (!document.getElementById('messages').contains(msgEl))
+                document.getElementById('messages').appendChild(msgEl);
+              scrollBottom();
+            } else if (evt === 'tool_result' || evt === 'done') {
+              const ti = msgEl.querySelector('.tool-indicator');
+              if (ti) ti.remove();
+            } else if (evt === 'error') {
+              bubbleEl.innerHTML += '<em style="color:var(--red);display:block;margin-top:8px;">&#9888; ' + (data.message||'Error') + '</em>';
+              if (!document.getElementById('messages').contains(msgEl))
+                document.getElementById('messages').appendChild(msgEl);
+              scrollBottom();
+            }
+          } catch {}
+          evt = null;
+        }
+      }
+    }
+  } catch(e) {
+    removeTyping(typingId);
+    if (!document.getElementById('messages').contains(msgEl))
+      document.getElementById('messages').appendChild(msgEl);
+    bubbleEl.innerHTML = '<em style="color:var(--red)">Connection error: ' + e.message + '</em>';
+  } finally {
+    isStreaming = false;
+    document.getElementById('send-btn').disabled = !getInputText();
+    if (assistantText) history.push({ role: 'assistant', content: assistantText });
+    scrollBottom();
+  }
+}
+
+function appendMsg(role, text) {
+  const m = document.createElement('div'); m.className = 'msg ' + role;
+  const b = document.createElement('div'); b.className = 'bubble'; b.innerHTML = fmt(text);
+  m.appendChild(b); document.getElementById('messages').appendChild(m); scrollBottom();
+}
+function createAsstBubble() {
+  const msgEl = document.createElement('div'); msgEl.className = 'msg assistant';
+  const bubbleEl = document.createElement('div'); bubbleEl.className = 'bubble';
+  msgEl.appendChild(bubbleEl); return { msgEl, bubbleEl };
+}
+function showTyping() {
+  const id = 'typ-' + Date.now();
+  const d = document.createElement('div'); d.id = id; d.className = 'msg assistant';
+  d.innerHTML = '<div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div>';
+  document.getElementById('messages').appendChild(d); scrollBottom(); return id;
+}
+function removeTyping(id) { const el = document.getElementById(id); if (el) el.remove(); }
+function scrollBottom() { const m = document.getElementById('messages'); m.scrollTop = m.scrollHeight; }
+function mkToolIndicator(name) {
+  const labels = {
+    search_files:'Searching catalog',
+    get_catalog_stats:'Reading stats',
+    browse_folder:'Browsing folder',
+    find_large_files:'Finding large files',
+    find_recent_files:'Checking recent files',
+    search_by_type:'Filtering by type',
+    get_type_breakdown:'Analysing file types',
+  };
+  const ti = document.createElement('div'); ti.className = 'tool-indicator';
+  ti.innerHTML = '<div class="tool-spinner"></div>' + (labels[name] || name.replace(/_/g,' '));
+  return ti;
+}
+function fmt(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/`(.+?)`/g,'<code>$1</code>')
+    .replace(/\n/g,'<br>');
+}
+</script>
+</body>
+</html>
