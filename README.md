@@ -4,7 +4,7 @@
 
 Deep42 builds a searchable metadata catalog of your local folders and Dropbox portals — without reorganizing, uploading, or moving your files.
 
-**Repository:** [github.com/neetasandeepshah/deep42](https://github.com/neetasandeepshah/deep42)
+**Repository:** [github.com/neetasandeepshah/Deep42](https://github.com/neetasandeepshah/Deep42)
 
 **Maintainer:** GitHub [@neetasandeepshah](https://github.com/neetasandeepshah) · [neetasandeepshah@gmail.com](mailto:neetasandeepshah@gmail.com)
 
